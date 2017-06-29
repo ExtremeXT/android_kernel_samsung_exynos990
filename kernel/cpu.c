@@ -951,6 +951,9 @@ static int __ref _cpu_down(unsigned int cpu, int tasks_frozen,
 
 	cpus_write_lock();
 
+	if (!tasks_frozen && !cpu_isolated(cpu) && num_online_uniso_cpus() == 1)
+		return -EBUSY;
+
 	cpuhp_tasks_frozen = tasks_frozen;
 
 	prev_state = cpuhp_set_state(st, target);
