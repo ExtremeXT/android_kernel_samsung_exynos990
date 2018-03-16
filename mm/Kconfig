@@ -775,6 +775,14 @@ config PROCESS_RECLAIM_IGNORE_ALL_TYPE
 	help
 	  This is temporary workaround for app compactor.
 
+config VM_MAX_READAHEAD_KB
+	int "Default max readahead window size in Kilobytes"
+	default 128
+	help
+	  This sets the VM_MAX_READAHEAD value to allow the readahead window
+	  to grow to a maximum size of configured. Increasing this value will
+	  benefit sequential read throughput.
+
 config INCREASE_MAXIMUM_SWAPPINESS
 	bool "Allow swappiness to be set up to 200"
 	depends on SWAP
