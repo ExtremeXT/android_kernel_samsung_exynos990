@@ -684,6 +684,7 @@ void iovmm_unmap_oto(struct device *dev, phys_addr_t phys)
 	}
 }
 
+#ifdef CONFIG_DEBUG_FS
 static struct dentry *exynos_iovmm_debugfs_root;
 static struct dentry *exynos_iommu_debugfs_root;
 
@@ -760,6 +761,7 @@ static void iovmm_register_debugfs(struct exynos_iovmm *vmm)
 	debugfs_create_file(vmm->domain_name, 0664,
 			exynos_iovmm_debugfs_root, vmm, &iovmm_debug_fops);
 }
+#endif
 
 struct exynos_iovmm *exynos_create_single_iovmm(const char *name,
 					unsigned int start, unsigned int end)
@@ -787,6 +789,7 @@ struct exynos_iovmm *exynos_create_single_iovmm(const char *name,
 		goto err_setup_domain;
 	}
 
+#ifdef CONFIG_DEBUG_FS
 	ret = exynos_iommu_init_event_log(IOVMM_TO_LOG(vmm), IOVMM_LOG_LEN);
 	if (!ret) {
 		iovmm_add_log_to_debugfs(exynos_iovmm_debugfs_root,
@@ -796,6 +799,11 @@ struct exynos_iovmm *exynos_create_single_iovmm(const char *name,
 	} else {
 		goto err_init_event_log;
 	}
+#else
+	ret = exynos_iommu_init_event_log(IOVMM_TO_LOG(vmm), IOVMM_LOG_LEN);
+	if (ret)
+		goto err_init_event_log;
+#endif
 
 	spin_lock_init(&vmm->vmlist_lock);
 	spin_lock_init(&vmm->bitmap_lock);
@@ -804,7 +812,9 @@ struct exynos_iovmm *exynos_create_single_iovmm(const char *name,
 
 	vmm->domain_name = name;
 
+#ifdef CONFIG_DEBUG_FS
 	iovmm_register_debugfs(vmm);
+#endif
 
 	pr_debug("%s IOVMM: Created %#zx B IOVMM from %#x.\n",
 			name, vmm->iovm_size, vmm->iova_start);
