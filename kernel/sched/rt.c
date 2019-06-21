@@ -2488,9 +2488,11 @@ const struct sched_class rt_sched_class = {
 
 	.update_curr		= update_curr_rt,
 
+#ifdef CONFIG_UCLAMP_TASK
+	.uclamp_enabled		= 1,
+#endif
 #ifdef CONFIG_RT_GROUP_SCHED
 	.task_change_group	= frt_task_change_group_rt,
-#endif
 };
 
 #ifdef CONFIG_RT_GROUP_SCHED
