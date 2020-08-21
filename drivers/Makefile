@@ -227,9 +227,6 @@ obj-y                           += motor/
 # uH
 obj-$(CONFIG_UH)        += uh/
 
-# OLOG
-obj-y				+= kperfmon/
-
 # streamline
 ifeq ($(CONFIG_GATOR), y)
 	obj-$(CONFIG_GATOR)				+= gator/
