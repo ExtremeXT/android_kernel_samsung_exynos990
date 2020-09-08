@@ -36,7 +36,7 @@ suspend_state_t pm_suspend_target_state;
 #ifdef CONFIG_BOEFFLA_WL_BLOCKER
 #include "boeffla_wl_blocker.h"
 
-char list_wl_search[LENGTH_LIST_WL_SEARCH] = {0};
+char list_wl_search[LENGTH_LIST_WL_SEARCH];
 bool wl_blocker_active = false;
 bool wl_blocker_debug = false;
 
