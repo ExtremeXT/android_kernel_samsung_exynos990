@@ -157,7 +157,7 @@ void profiler_systrace_write(int pid, char id, char *str, int value)
 			return;
 	}
 	panel_info("%s\n", buf);
-	trace_printk(buf);
+
 
 }
 

@@ -135,8 +135,10 @@ struct va_format {
  */
 #define no_printk(fmt, ...)				\
 ({							\
-	if (0)						\
-		printk(fmt, ##__VA_ARGS__);		\
+	do {						\
+		if (0)					\
+			printk(fmt, ##__VA_ARGS__);	\
+	} while (0);					\
 	0;						\
 })
 

@@ -76,8 +76,10 @@
 
 #ifdef MODULE
 #define __exitused
+#define __inittrace notrace
 #else
 #define __exitused  __used
+#define __inittrace
 #endif
 
 #define __exit          __section(.exit.text) __exitused __cold notrace
