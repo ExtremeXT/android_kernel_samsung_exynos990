@@ -1345,7 +1345,6 @@ config UH
 	  please check a memory map for it.
 
 config FASTUH_RKP
-	bool "
 	bool "Enable RKP (Realtime Kernel Protection) UH feature"
 	depends on UH && !UH_RKP
 	default n
