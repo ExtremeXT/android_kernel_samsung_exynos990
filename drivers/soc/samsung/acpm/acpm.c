@@ -14,12 +14,15 @@
 #include <linux/of.h>
 #include <linux/of_address.h>
 #include <linux/platform_device.h>
-#include <linux/debugfs.h>
 #include <linux/interrupt.h>
 #include <linux/slab.h>
 #include <linux/debug-snapshot.h>
 #include <linux/soc/samsung/exynos-soc.h>
 #include <linux/sched/clock.h>
+
+#ifdef CONFIG_DEBUG_FS
+#include <linux/debugfs.h>
+#endif // CONFIG_DEBUG_FS
 
 #include "acpm.h"
 #include "acpm_ipc.h"
@@ -230,6 +233,7 @@ DEFINE_SIMPLE_ATTRIBUTE(debug_log_level_fops,
 DEFINE_SIMPLE_ATTRIBUTE(debug_ipc_loopback_test_fops,
 		debug_ipc_loopback_test_get, debug_ipc_loopback_test_set, "%llu\n");
 
+#ifdef CONFIG_DEBUG_FS
 static void acpm_debugfs_init(struct acpm_info *acpm)
 {
 	struct dentry *den;
@@ -238,6 +242,7 @@ static void acpm_debugfs_init(struct acpm_info *acpm)
 	debugfs_create_file("ipc_loopback_test", 0644, den, acpm, &debug_ipc_loopback_test_fops);
 	debugfs_create_file("log_level", 0644, den, NULL, &debug_log_level_fops);
 }
+#endif // CONFIG_DEBUG_FS
 
 void *memcpy_align_4(void *dest, const void *src, unsigned int n)
 {
@@ -432,8 +437,9 @@ static int acpm_probe(struct platform_device *pdev)
 
 	exynos_acpm = acpm;
 
+#ifdef CONFIG_DEBUG_FS
 	acpm_debugfs_init(acpm);
-
+#endif // CONFIG_DEBUG_FS
 	exynos_acpm_timer_clear();
 
 	acpm_lcd_nb.notifier_call = acpm_lcd_notifier;
