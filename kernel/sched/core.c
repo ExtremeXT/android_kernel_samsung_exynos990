@@ -1495,8 +1495,6 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
 		for_each_cpu(dest_cpu, nodemask) {
 			if (!cpu_active(dest_cpu))
 				continue;
-			if (cpu_isolated(dest_cpu))
-				continue;
 			if (cpumask_test_cpu(dest_cpu, &p->cpus_allowed)) {
 				if (cpu_rq(dest_cpu)->nr_running < 32)
 					return dest_cpu;
