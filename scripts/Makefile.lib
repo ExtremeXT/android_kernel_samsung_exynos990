@@ -251,6 +251,9 @@ DTC ?= $(objtree)/scripts/dtc/dtc
 # Overlay support
 DTC_FLAGS += -@
 
+# Silence all DTC warnings by default.
+DTC_FLAGS += -q
+
 # Disable noisy checks by default
 ifeq ($(findstring 1,$(KBUILD_ENABLE_EXTRA_GCC_CHECKS)),)
 DTC_FLAGS += -Wno-unit_address_vs_reg \
