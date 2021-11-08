@@ -2701,6 +2701,7 @@ static void mmdrop_async_free(struct work_struct *work)
 {
 	struct mm_struct *mm = container_of(work, typeof(*mm), async_put_work);
 
+	membarrier_mm_sync_core_before_usermode(mm);
 	__mmdrop(mm);
 }
 
@@ -2782,7 +2783,6 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 	 */
 	if (mm && atomic_dec_and_test(&mm->mm_count)) {
 		INIT_WORK(&mm->async_put_work, mmdrop_async_free);
-		membarrier_mm_sync_core_before_usermode(mm);
 		queue_work(system_unbound_wq, &mm->async_put_work);
 	}
 	if (unlikely(prev_state == TASK_DEAD)) {
