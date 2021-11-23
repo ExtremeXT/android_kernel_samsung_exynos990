@@ -920,10 +920,16 @@ int elevator_init_mq(struct request_queue *q)
 	if (unlikely(q->elevator))
 		goto out;
 
-	e = elevator_get(q, "mq-deadline", false);
+		if (IS_ENABLED(CONFIG_BFQ_DEFAULT)) {
+			e = elevator_get(q, "bfq", false);
+		} else if (IS_ENABLED(CONFIG_MQ_KYBER_DEFAULT)) {
+			e = elevator_get(q, "kyber", false);
+		} else {
+			e = elevator_get(q, "mq-deadline", false);
+		}
+
 	if (!e)
 		goto out;
-
 	err = blk_mq_init_sched(q, e);
 	if (err)
 		elevator_put(e);
