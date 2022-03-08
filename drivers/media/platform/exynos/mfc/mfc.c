@@ -1630,7 +1630,9 @@ static int mfc_probe(struct platform_device *pdev)
 	itmon_notifier_chain_register(&dev->itmon_nb);
 #endif
 
+#ifdef CONFIG_DEBUG_FS
 	mfc_init_debugfs(dev);
+#endif // CONFIG_DEBUG_FS
 
 	dev_dbg(&pdev->dev, "%s--\n", __func__);
 	return 0;
