@@ -321,10 +321,8 @@ include scripts/subarch.include
 # Alternatively CROSS_COMPILE can be set in the environment.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-SUBARCH		= arm64
-ARCH            = arm64
-CROSS_COMPILE   ?= $(srctree)/toolchain/gcc_4.9/bin/aarch64-linux-android-
-CROSS_COMPILE_COMPAT   ?= $(srctree)/toolchain/gcc_4.9_arm32/bin/arm-linux-androidkernel-
+ARCH		?= arm64
+CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -375,7 +373,7 @@ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
 # Make variables (CC, etc...)
 AS		= $(CCACHE) $(CROSS_COMPILE)as
 LD		= $(CCACHE) $(CROSS_COMPILE)ld
-CC              = $(CCACHE) $(srctree)/toolchain/clang_r416183b/bin/clang
+CC              = $(CCACHE) $(CROSS_COMPILE)gcc
 CPP		= $(CCACHE) $(CC) -E
 AR		= $(CCACHE) $(CROSS_COMPILE)ar
 NM		= $(CCACHE) $(CROSS_COMPILE)nm
@@ -498,8 +496,7 @@ endif
 
 ifeq ($(cc-name),clang)
 ifneq ($(CROSS_COMPILE),)
-#CLANG_TRIPLE	?= $(CROSS_COMPILE)
-CLANG_TRIPLE	?= $(srctree)/toolchain/clang/host/linux-x86/clang-r349610-jopp/bin/aarch64-linux-gnu-
+CLANG_TRIPLE	?= $(CROSS_COMPILE)
 CLANG_FLAGS	+= --target=$(notdir $(CLANG_TRIPLE:%-=%))
 ifeq ($(shell $(srctree)/scripts/clang-android.sh $(CC) $(CLANG_FLAGS)), y)
 $(error "Clang with Android --target detected. Did you specify CLANG_TRIPLE?")
