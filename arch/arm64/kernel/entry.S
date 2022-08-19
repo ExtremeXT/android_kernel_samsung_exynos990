@@ -521,11 +521,7 @@ __bad_stack:
 	 * S_FRAME_SIZE) was stashed in tpidr_el0 by kernel_ventry.
 	 */
 	sub	sp, sp, #S_FRAME_SIZE
-#ifdef CONFIG_SEC_DEBUG_BAD_STACK_CAREFULLY
-	kernel_entry fake_el_bad_stack
-#else
 	kernel_entry 1
-#endif
 	mrs	x0, tpidr_el0
 #ifdef CONFIG_SEC_DEBUG_EXCEPTION_STACK
 	add	x0, x0, #(S_FRAME_SIZE+PRESERVE_STACK_SIZE)
