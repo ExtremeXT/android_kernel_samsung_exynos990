@@ -4561,12 +4561,15 @@ static ssize_t mask_brightness_show(struct device *dev,
 	return strlen(buf);
 }
 
+extern int panel_set_mask_layer(struct panel_device *panel, void *arg);
+
 static ssize_t mask_brightness_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t size)
 {
 	struct panel_info *panel_data;
 	struct panel_device *panel = dev_get_drvdata(dev);
 	struct panel_bl_device *panel_bl;
+	struct mask_layer_data req_data;
 	int value, rc;
 
 	rc = kstrtouint(buf, 0, &value);
@@ -4590,6 +4593,13 @@ static ssize_t mask_brightness_store(struct device *dev,
 			panel_bl->props.mask_layer_br_target, value);
 
 	panel_bl->props.mask_layer_br_target = value;
+
+	// doomvrr: mask layer brightness control workaround for r8s
+	memset(&req_data, 0, sizeof(req_data));
+	req_data.req_mask_layer = value > 0 ? MASK_LAYER_ON : MASK_LAYER_OFF;
+	req_data.trigger_time = MASK_LAYER_TRIGGER_BEFORE;
+
+	panel_set_mask_layer(panel, &req_data);
 
 	return size;
 }

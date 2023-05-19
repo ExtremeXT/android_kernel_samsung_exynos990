@@ -3046,7 +3046,7 @@ static int panel_powerdown_cb(struct panel_device *panel)
 #endif
 
 #ifdef CONFIG_SUPPORT_MASK_LAYER
-static int panel_set_mask_layer(struct panel_device *panel, void *arg)
+int panel_set_mask_layer(struct panel_device *panel, void *arg)
 {
 	int ret = 0;
 	struct panel_bl_device *panel_bl = &panel->panel_bl;
