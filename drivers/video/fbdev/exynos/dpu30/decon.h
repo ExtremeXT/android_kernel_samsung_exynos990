@@ -1340,6 +1340,12 @@ struct dma_leak_info {
 };
 #endif
 
+struct vsync_applied_time_data {
+	u32 config;
+	u64 time;
+	u32 reserved[4];
+};
+
 struct decon_device {
 	int id;
 	enum decon_state state;
@@ -2197,6 +2203,10 @@ int _decon_enable(struct decon_device *decon, enum decon_state state);
 #endif
 /* EDID data */
 #define EXYNOS_GET_EDID		_IOW('F', 800, struct decon_edid_data)
+
+/* For HWC2.4 */
+#define EXYNOS_GET_VSYNC_CHANGE_TIMELINE	_IOW('F', 850, struct vsync_applied_time_data)
+
 #if defined(CONFIG_EXYNOS_COMMON_PANEL)
 #define V4L2_EVENT_DECON                (V4L2_EVENT_PRIVATE_START + 1000)
 #define V4L2_EVENT_DECON_FRAME_START    (V4L2_EVENT_DECON + 1)
