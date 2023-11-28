@@ -319,8 +319,8 @@ include scripts/subarch.include
 # Alternatively CROSS_COMPILE can be set in the environment.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-ARCH		?= $(SUBARCH)
-ARCH            ?= arm64
+SUBARCH		= arm64
+ARCH            = arm64
 CROSS_COMPILE	?= $(srctree)/toolchain/gcc-cfp/gcc-cfp-jopp-only/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 
 # Architecture as present in compile.h
@@ -489,6 +489,13 @@ ifneq ($(KBUILD_SRC),)
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile \
 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
 endif
+
+PLATFORM_VERSION ?= 11.0.0
+ANDROID_MAJOR_VERSION ?= r
+SEC_BUILD_CONF_VENDOR_BUILD_OS ?= 13
+export PLATFORM_VERSION
+export ANDROID_MAJOR_VERSION
+export SEC_BUILD_CONF_VENDOR_BUILD_OS
 
 ifeq ($(cc-name),clang)
 ifneq ($(CROSS_COMPILE),)
