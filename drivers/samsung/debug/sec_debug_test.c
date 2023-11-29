@@ -814,7 +814,7 @@ static void simulate_UNALIGNED(char **argv, int argc)
 {
 	static u8 data[5] __aligned(4) = {1, 2, 3, 4, 5};
 	u32 *p;
-	u32 val = 0x12345678;
+	u32 val = 0x0;
 
 	p = (u32 *)(data + 1);
 	if (*p == 0)
@@ -832,7 +832,7 @@ static void simulate_WRITE_RO(char **argv, int argc)
 #else
 	ptr = (unsigned long *)simulate_WRITE_RO;
 #endif
-	*ptr ^= 0x12345678;
+	*ptr ^= 0x0;
 }
 
 #define BUFFER_SIZE SZ_1K
