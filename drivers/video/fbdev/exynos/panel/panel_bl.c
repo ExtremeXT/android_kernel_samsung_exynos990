@@ -871,11 +871,7 @@ int panel_update_brightness(struct panel_device *panel)
 	}
 	mutex_lock(&panel->op_lock);
 	// S21 Ported firmware sends lower brightness values, we multiply by 100 before sending it to the hardware
-	if (bd->props.brightness > 0 && bd->props.brightness < 256) 
-		brightness = bd->props.brightness * 100;
-	else
-		brightness = bd->props.brightness;
-
+	brightness = bd->props.brightness * 100;
 #ifdef CONFIG_SUPPORT_MASK_LAYER
 	if (panel_bl->props.mask_layer_br_hook == MASK_LAYER_HOOK_ON) {
 		brightness = panel_bl->props.mask_layer_br_target;
