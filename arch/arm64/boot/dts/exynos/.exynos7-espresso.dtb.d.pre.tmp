@@ -1,0 +1,2 @@
+arch/arm64/boot/dts/exynos/.exynos7-espresso.dtb.dts.tmp: \
+  arch/arm64/boot/dts/exynos/exynos7-espresso.dts

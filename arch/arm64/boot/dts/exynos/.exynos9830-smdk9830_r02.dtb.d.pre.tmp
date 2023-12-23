@@ -1,0 +1,2 @@
+arch/arm64/boot/dts/exynos/.exynos9830-smdk9830_r02.dtb.dts.tmp: \
+  arch/arm64/boot/dts/exynos/exynos9830-smdk9830_r02.dts
