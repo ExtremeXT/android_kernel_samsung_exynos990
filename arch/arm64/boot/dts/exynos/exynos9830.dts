@@ -13880,7 +13880,7 @@
 		g3d_genpd_name = "pd-embedded_g3d";
 		#cooling-cells = <0x02>;
 		governor = "interactive";
-		interactive_info = <832000 0x5e 0x00>;
+		interactive_info = <1372000 0x5e 0x00>;
 		gpu_dvfs_table_size = <0x07 0x08>;
 		/*  8 columns      freq  down   up  stay  mif   little  middle   big  */
 		gpu_dvfs_table = <
@@ -13888,19 +13888,19 @@
 			702000    78   90   5  2730000  2106000 2600000 3016000
 			572000    78   90   1  2730000  2106000 2600000 3016000
 			455000    75   85   1  2730000  1300000 1222000 1456000
-			377000    78   90   1  1352000        0       0       0
-			260000    78   93   1  1352000        0       0       0 >;
+			377000    78   90   1  1352000  1300000 1222000 1456000
+			260000    78   93   1  1352000  1300000 1222000 1456000 >;
 		gpu_sustainable_info = <832000 0x55 0x00 0x00 0x00>;
 		gpu_pmu_status_reg_offset = <0x2204>;
 		gpu_pmu_status_local_pwr_mask = <0x01>;
 		gpu_max_clock = <832000>;
 		gpu_min_clock = <260000>;
 		gpu_dvfs_start_clock = <832000>;
-		gpu_default_voltage = <832000>;
-		gpu_voltage_offset_margin = <37450>;
+		gpu_default_voltage = <799898>;
+		gpu_voltage_offset_margin = <37500>;
 		gpu_power_coeff = <0x271>;
 		gpu_dvfs_time_interval = <0x05>;
-		gpu_dynamic_abb = <0x01>;
+		gpu_dynamic_abb = <0x00>;
 		gpu_early_clk_gating = <0x01>;
 		gpu_dvs = <0x01>;
 		gpu_inter_frame_pm = <0x01>;
