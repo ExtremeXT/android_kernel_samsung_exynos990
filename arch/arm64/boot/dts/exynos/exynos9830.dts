@@ -7882,7 +7882,7 @@
 
 			g3d_performance {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x40>;
@@ -7893,7 +7893,7 @@
 
 			camera_default {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x20>;
@@ -7977,7 +7977,7 @@
 
 			g3d_performance {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x40>;
@@ -7989,7 +7989,7 @@
 
 			camera_default {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x010>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x20>;
@@ -8072,7 +8072,7 @@
 
 			g3d_performance {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x40>;
@@ -8084,7 +8084,7 @@
 
 			camera_default {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x08>;
 				awqos = <0x08>;
 				rmo = <0x20>;
@@ -8180,7 +8180,7 @@
 
 			g3d_performance {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x04>;
 				awqos = <0x04>;
 				rmo = <0x0b>;
@@ -8191,7 +8191,7 @@
 
 			camera_default {
 				stat_on = <0x01>;
-				bypass = <0x00>;
+				bypass = <0x01>;
 				arqos = <0x04>;
 				awqos = <0x04>;
 				rmo = <0x0b>;
@@ -13881,52 +13881,35 @@
 		#cooling-cells = <0x02>;
 		governor = "interactive";
 		interactive_info = <832000 0x5e 0x00>;
-		gpu_dvfs_table_size = <0x08 0x08>;
+		gpu_dvfs_table_size = <0x07 0x08>;
 		/*  8 columns      freq  down   up  stay  mif   little  middle   big  */
 		gpu_dvfs_table = <
-			832000    78  100   5  2730000  1300000 1222000 1456000
-			800000    78  100   5  2535000  1300000       0 1456000
-			702000    78   90   5  2535000  1157000       0       0
-			572000    78   90   1  2028000  1157000       0       0
-			455000    75   85   1  1539000  1053000       0       0
+		        832000    78  100   5  2730000  2106000 2600000 3016000
+			702000    78   90   5  2730000  2106000 2600000 3016000
+			572000    78   90   1  2730000  2106000 2600000 3016000
+			455000    75   85   1  2730000  1300000 1222000 1456000
 			377000    78   90   1  1352000        0       0       0
-			260000    78   93   1  1352000        0       0       0
-			156000     0   93   1   845000        0       0       0 >;
+			260000    78   93   1  1352000        0       0       0 >;
 		gpu_sustainable_info = <832000 0x55 0x00 0x00 0x00>;
 		gpu_pmu_status_reg_offset = <0x2204>;
 		gpu_pmu_status_local_pwr_mask = <0x01>;
 		gpu_max_clock = <832000>;
-		gpu_max_clock_limit = <832000>;
-		gpu_min_clock = <0x26160>;
-		gpu_dvfs_start_clock = <0x3f7a0>;
-		gpu_dvfs_bl_config_clock = <0x26160>;
-		gpu_default_voltage = <0xc3500>;
-		gpu_cold_minimum_vol = <0x00>;
-		gpu_voltage_offset_margin = <0x927c>;
-		gpu_tmu_control = <0x01>;
-		gpu_temp_throttling_level_num = <0x06>;
+		gpu_min_clock = <260000>;
+		gpu_dvfs_start_clock = <832000>;
+		gpu_default_voltage = <832000>;
+		gpu_voltage_offset_margin = <37450>;
 		gpu_power_coeff = <0x271>;
 		gpu_dvfs_time_interval = <0x05>;
-		gpu_default_wakeup_lock = <0x01>;
-		gpu_dynamic_abb = <0x00>;
-		gpu_early_clk_gating = <0x00>;
-		gpu_dvs = <0x00>;
+		gpu_dynamic_abb = <0x01>;
+		gpu_early_clk_gating = <0x01>;
+		gpu_dvs = <0x01>;
 		gpu_inter_frame_pm = <0x01>;
-		gpu_inter_frame_dynamic_util = <0x32>;
-		gpu_inter_frame_dynamic_freq = <0xab630>;
-		gpu_perf_gathering = <0x00>;
 		gpu_runtime_pm_delay_time = <0x32>;
 		gpu_dvfs_polling_time = <0x1e>;
-		gpu_cl_dvfs_start_base = <0x5c0a8>;
 		gpu_debug_level = <0x03>;
 		gpu_trace_level = <0x08>;
 		gpu_mo_min_clock = <0x5c0a8>;
-		gpu_boost_gpu_min_lock = <0x00>;
-		gpu_boost_egl_min_lock = <0x1c9080>;
-		gpu_vk_boost_max_lock = <0x4f588>;
-		gpu_vk_boost_mif_min_lock = <0xf78f0>;
 		gpu_bts_support = <0x01>;
-		gpu_neg_boost_clock = <832000>;
 		phandle = <0x146>;
 	};
 
@@ -14630,17 +14613,6 @@
 		};
 	};
 
-	exynos-gpu-profiler {
-		compatible = "samsung,exynos-gpu-profiler";
-		status = "okay";
-		cal-id = <0xb04000a>;
-		migov-id = <0x03>;
-		power-coefficient = <0x1ae7>;
-		static-power-coefficient = <0x00>;
-		tz-name = "G3D";
-		dvfs-node = <0x146>;
-	};
-
 	exynos-mif-profiler {
 		compatible = "samsung,exynos-mif-profiler";
 		status = "okay";
@@ -14667,8 +14639,8 @@
 		inc-perf-temp-thr = <0x41>;
 		inc-perf-power-thr = <0x2625a0>;
 		frame-src = <0x00>;
-		max-fps = <0x258>;
-		user-target-fps = <0x258>;
+		max-fps = <0x26c>;
+		user-target-fps = <0x26c>;
 		uncontrol-fps-delta-up = <0x1e>;
 		uncontrol-fps-delta-down = <0xfffffff6>;
 		dt-ctrl-en = <0x01>;
@@ -14717,17 +14689,6 @@
 			pm-qos-min-class = <0x07>;
 			pm-qos-max-class = <0x08>;
 			pm-qos-max-freq = <0x1cf610>;
-		};
-
-		gpu {
-			max = <0xdc>;
-			min = <0x01>;
-			up-step = <0x03>;
-			down-step = <0x06>;
-			default-step = <0x02>;
-			q0-empty-pct-thr = <0x00>;
-			q1-empty-pct-thr = <0x00>;
-			active-pct-thr = <0x64>;
 		};
 
 		mif {
