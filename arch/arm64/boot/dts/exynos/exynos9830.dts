@@ -13880,29 +13880,23 @@
 		g3d_genpd_name = "pd-embedded_g3d";
 		#cooling-cells = <0x02>;
 		governor = "interactive";
-		interactive_info = <897000 0x5e 0x00>;
-		gpu_dvfs_table_size = <14 8>;
+		interactive_info = <832000 0x5e 0x00>;
+		gpu_dvfs_table_size = <0x08 0x08>;
 		/*  8 columns      freq  down   up  stay  mif   little  middle   big  */
 		gpu_dvfs_table = <
-		        897000    78  100   5  2730000  1300000 1222000 1456000
 			832000    78  100   5  2730000  1300000 1222000 1456000
-			800000    78  100   5  2730000  1300000 1222000 1456000
-			767000    78   90   5  2730000  1300000 1222000 1456000
-			702000    78   90   5  2730000  1300000 1222000 1456000
-			598000    78   90   5  2730000  1300000 1222000 1456000
+			800000    78  100   5  2535000  1300000       0 1456000
+			702000    78   90   5  2535000  1157000       0       0
 			572000    78   90   1  2028000  1157000       0       0
-			507000    78   90   1  2028000  1157000       0       0
-			481000    75   85   1  1539000  1053000       0       0
 			455000    75   85   1  1539000  1053000       0       0
 			377000    78   90   1  1352000        0       0       0
-			325000    78   90   1  1352000        0       0       0
 			260000    78   93   1  1352000        0       0       0
 			156000     0   93   1   845000        0       0       0 >;
-		gpu_sustainable_info = <897000 0x55 0x00 0x00 0x00>;
+		gpu_sustainable_info = <832000 0x55 0x00 0x00 0x00>;
 		gpu_pmu_status_reg_offset = <0x2204>;
 		gpu_pmu_status_local_pwr_mask = <0x01>;
-		gpu_max_clock = <897000>;
-		gpu_max_clock_limit = <897000>;
+		gpu_max_clock = <832000>;
+		gpu_max_clock_limit = <832000>;
 		gpu_min_clock = <0x26160>;
 		gpu_dvfs_start_clock = <0x3f7a0>;
 		gpu_dvfs_bl_config_clock = <0x26160>;
@@ -13932,7 +13926,7 @@
 		gpu_vk_boost_max_lock = <0x4f588>;
 		gpu_vk_boost_mif_min_lock = <0xf78f0>;
 		gpu_bts_support = <0x01>;
-		gpu_neg_boost_clock = <897000>;
+		gpu_neg_boost_clock = <832000>;
 		phandle = <0x146>;
 	};
 
