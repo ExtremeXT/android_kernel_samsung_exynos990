@@ -13898,20 +13898,19 @@
 			325000    78   90   1  1352000        0       0       0
 			260000    78   93   1  1352000        0       0       0
 			156000     0   93   1   845000        0       0       0 >;
-		gpu_sustainable_info = <897000 85 0 0 0>;
-		gpu_pmu_status_reg_offset = <8708>;
-		gpu_pmu_status_local_pwr_mask = <1>;
+		gpu_sustainable_info = <897000 0x55 0x00 0x00 0x00>;
+		gpu_pmu_status_reg_offset = <0x2204>;
+		gpu_pmu_status_local_pwr_mask = <0x01>;
 		gpu_max_clock = <897000>;
 		gpu_max_clock_limit = <897000>;
-		gpu_min_clock = <156000>;
+		gpu_min_clock = <0x26160>;
 		gpu_dvfs_start_clock = <0x3f7a0>;
 		gpu_dvfs_bl_config_clock = <0x26160>;
 		gpu_default_voltage = <0xc3500>;
 		gpu_cold_minimum_vol = <0x00>;
 		gpu_voltage_offset_margin = <0x927c>;
 		gpu_tmu_control = <0x01>;
-		gpu_temp_throttling_level_num = <14>;
-		gpu_temp_throttling = <897000 832000 800000 767000 702000 598000 572000 507000 481000 455000 377000 325000 260000 156000>;
+		gpu_temp_throttling_level_num = <0x06>;
 		gpu_power_coeff = <0x271>;
 		gpu_dvfs_time_interval = <0x05>;
 		gpu_default_wakeup_lock = <0x01>;
