@@ -13896,7 +13896,7 @@
 		gpu_max_clock = <832000>;
 		gpu_min_clock = <260000>;
 		gpu_dvfs_start_clock = <832000>;
-		gpu_default_voltage = <799898>;
+		gpu_default_voltage = <800000>;
 		gpu_voltage_offset_margin = <37500>;
 		gpu_power_coeff = <0x271>;
 		gpu_dvfs_time_interval = <0x05>;
