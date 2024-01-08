@@ -2066,11 +2066,6 @@
 				android {
 					compatible = "android,firmware";
 					phandle = <0xb8>;
-
-					vbmeta {
-						compatible = "android,vbmeta";
-						parts = "vbmeta,boot,system,vendor,product,odm,prism,optics,vbmeta_samsung,recovery,dtbo,keystorage,harx";
-					};
 				};
 			};
 
