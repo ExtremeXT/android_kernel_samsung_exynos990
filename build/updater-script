@@ -1,0 +1,9 @@
+ui_print(" ");
+ui_print("Installing ExtremeKernel UNOFFICIAL...");
+ui_print(" ");
+
+package_extract_file("files/boot.img", "/dev/block/bootdevice/by-name/boot");
+package_extract_file("files/dtbo.img", "/dev/block/bootdevice/by-name/dtbo");
+
+ui_print("Installation done!");
+ui_print(" ");
