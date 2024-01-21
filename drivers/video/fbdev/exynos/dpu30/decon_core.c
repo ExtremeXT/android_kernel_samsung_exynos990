@@ -4617,10 +4617,9 @@ static int decon_ioctl(struct fb_info *info, unsigned int cmd,
 
 		mode = &lcd_info->display_mode[display_mode.index].mode;
 		memcpy(&display_mode, mode, sizeof(display_mode));
-
-		decon_info("display mode[%d] : %dx%d@%d(%dx%dmm)\n",
+		decon_info("display mode[%d] : %dx%d@%d(%dx%dmm) group: %d\n",
 				display_mode.index, mode->width, mode->height,
-				mode->fps, mode->mm_width, mode->mm_height);
+				mode->fps, mode->mm_width, mode->mm_height, mode->group);
 
 		if (copy_to_user((void __user *)arg,
 					&display_mode, _IOC_SIZE(cmd))) {

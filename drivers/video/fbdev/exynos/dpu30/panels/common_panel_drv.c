@@ -273,6 +273,7 @@ static void exynos_panel_get_display_modes(struct exynos_panel_info *info,
 	int i;
 	const unsigned int *addr;
 	unsigned int *mode_item;
+	u32 disp_group = 0;
 
 	DPU_INFO_PANEL("%s +\n", __func__);
 
@@ -309,11 +310,20 @@ static void exynos_panel_get_display_modes(struct exynos_panel_info *info,
 		info->display_mode[i].dsc_dec_sw =
 			info->display_mode[i].mode.width / info->dsc.slice_num;
 
-		DPU_INFO_PANEL("display mode[%d] : %dx%d@%d, %dmm x %dmm, lp_ref(%d)\n",
+		if ((i > 0) &&
+			((info->display_mode[i].mode.width != info->display_mode[i - 1].mode.width) ||
+			(info->display_mode[i].mode.height != info->display_mode[i - 1].mode.height))) {
+				disp_group++;
+			}
+
+		info->display_mode[i].mode.group = disp_group;
+
+		DPU_INFO_PANEL("found display mode[%d] : %dx%d@%d, group %d %dmm x %dmm, lp_ref(%d)\n",
 				info->display_mode[i].mode.index,
 				info->display_mode[i].mode.width,
 				info->display_mode[i].mode.height,
 				info->display_mode[i].mode.fps,
+				info->display_mode[i].mode.group,
 				info->display_mode[i].mode.mm_width,
 				info->display_mode[i].mode.mm_height,
 				info->display_mode[i].cmd_lp_ref);
