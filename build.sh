@@ -128,8 +128,8 @@ echo "Building zip..."
 echo "-----------------------------------------------"
 cp build/out/boot.img build/out/zip/files/boot.img
 cp build/out/dtbo.img build/out/zip/files/dtbo.img
-cp build/updater-script build/out/zip/META-INF/com/google/android
 cp build/update-binary build/out/zip/META-INF/com/google/android/
+cp build/updater-script build/out/zip/META-INF/com/google/android/
 pushd build/out/zip > /dev/null
 DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 zip -r ../ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip . || abort
