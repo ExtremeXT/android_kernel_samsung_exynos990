@@ -459,6 +459,10 @@ export KBUILD_ARFLAGS
 # even be read-only.
 export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_versions
 
+# Export hardcoded PLATFORM_VERSION
+PLATFORM_VERSION ?= 13
+export PLATFORM_VERSION
+
 # Files to ignore in find ... statements
 
 export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
@@ -489,13 +493,6 @@ ifneq ($(KBUILD_SRC),)
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile \
 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
 endif
-
-PLATFORM_VERSION ?= 11.0.0
-ANDROID_MAJOR_VERSION ?= r
-SEC_BUILD_CONF_VENDOR_BUILD_OS ?= 13
-export PLATFORM_VERSION
-export ANDROID_MAJOR_VERSION
-export SEC_BUILD_CONF_VENDOR_BUILD_OS
 
 ifeq ($(cc-name),clang)
 ifneq ($(CROSS_COMPILE),)
