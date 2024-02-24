@@ -9,16 +9,18 @@ abort()
 }
 
 MODEL=$1
+KSU_OPTION=$2
 CORES=`cat /proc/cpuinfo | grep -c processor`
 
 echo "Preparing the build environment..."
 
+rm -rf arch/arm64/configs/temp_defconfig
 rm -rf build/dtb.img
 rm -rf build/out
 rm -rf build/dtb.img
 rm -rf build/ramdisk.cpio.gz
 mkdir -p build/out/zip/files
-mkdir -p build/out/zip/META-INF/com/google/android/
+mkdir -p build/out/zip/META-INF/com/google/android
 
 # Define specific variables
 case $MODEL in
@@ -63,11 +65,33 @@ c2s)
     exit
 esac
 
-# Build kernel
+case $KSU_OPTION in
+y)
+    KSU=1
+;;
+n)
+    KSU=0
+;;
+*)
+    KSU=0
+esac
+
+# Build kernel image
+echo "-----------------------------------------------"
+echo "Defconfig: "$KERNEL_DEFCONFIG""
+echo "KSU: "$KSU""
+echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-make $KERNEL_DEFCONFIG || abort
+cp arch/arm64/configs/$KERNEL_DEFCONFIG arch/arm64/configs/temp_defconfig
+if [ $KSU -eq 1 ];
+then
+    sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=y/g' arch/arm64/configs/temp_defconfig
+    sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
+    sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
+fi
+make temp_defconfig || abort
 echo "-----------------------------------------------"
 echo "Building kernel..."
 echo "-----------------------------------------------"
@@ -128,11 +152,17 @@ echo "Building zip..."
 echo "-----------------------------------------------"
 cp build/out/boot.img build/out/zip/files/boot.img
 cp build/out/dtbo.img build/out/zip/files/dtbo.img
-cp build/update-binary build/out/zip/META-INF/com/google/android/
-cp build/updater-script build/out/zip/META-INF/com/google/android/
+cp build/update-binary build/out/zip/META-INF/com/google/android/update-binary
+cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
 pushd build/out/zip > /dev/null
 DATE=`date +"%d-%m-%Y_%H-%M-%S"`
-zip -r ../ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip . || abort
+if [ $KSU -eq 1 ];
+then
+    NAME=ExtremeKernel_UNOFFICIAL_KSU_"$MODEL"_"$DATE".zip
+else
+    NAME=ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip
+fi
+zip -r ../"$NAME" . || abort
 popd > /dev/null
 echo "-----------------------------------------------"
 
