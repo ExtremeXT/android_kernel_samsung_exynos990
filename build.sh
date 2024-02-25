@@ -15,10 +15,7 @@ CORES=`cat /proc/cpuinfo | grep -c processor`
 echo "Preparing the build environment..."
 
 rm -rf arch/arm64/configs/temp_defconfig
-rm -rf build/dtb.img
 rm -rf build/out
-rm -rf build/dtb.img
-rm -rf build/ramdisk.cpio.gz
 mkdir -p build/out/zip/files
 mkdir -p build/out/zip/META-INF/com/google/android
 
@@ -60,8 +57,12 @@ c2s)
     KERNEL_DEFCONFIG=extreme_c2sxxx_defconfig
     BOARD=SRPTB27C009KU
 ;;
+twrp)
+    KERNEL_DEFCONFIG=twrp_defconfig
+    BOARD=SRPSI19A018KU
+;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, twrp"
     exit
 esac
 
@@ -100,7 +101,7 @@ echo "-----------------------------------------------"
 
 # Define constant variables
 DTB_PATH=build/out/dtb.img
-KERNEL_PATH=arch/arm64/boot/Image
+KERNEL_PATH=build/out/Image
 KERNEL_OFFSET=0x00008000
 DTB_OFFSET=0x00000000
 RAMDISK_OFFSET=0x01000000
@@ -117,13 +118,8 @@ RAMDISK=build/out/ramdisk.cpio.gz
 OUTPUT_FILE=build/out/boot.img
 
 ## Build auxiliary boot.img files
-# Build ramdisk
-echo "Building RAMDisk..."
-echo "-----------------------------------------------"
-pushd build/ramdisk > /dev/null
-find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/ramdisk.cpio.gz || abort
-popd > /dev/null
-echo "-----------------------------------------------"
+# Copy kernel to build
+cp arch/arm64/boot/Image build/out
 
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
@@ -137,33 +133,44 @@ echo "-----------------------------------------------"
 ./toolchain/mkdtimg cfg_create build/out/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
 echo "-----------------------------------------------"
 
-# Create boot image
-echo "Creating boot image..."
-echo "-----------------------------------------------"
-./toolchain/mkbootimg --base $BASE --board $BOARD --cmdline "$CMDLINE" --dtb $DTB_PATH \
---dtb_offset $DTB_OFFSET --hashtype $HASHTYPE --header_version $HEADER_VERSION --kernel $KERNEL_PATH \
---kernel_offset $KERNEL_OFFSET --os_patch_level $OS_PATCH_LEVEL --os_version $OS_VERSION --pagesize $PAGESIZE \
---ramdisk $RAMDISK --ramdisk_offset $RAMDISK_OFFSET \
---second_offset $SECOND_OFFSET --tags_offset $TAGS_OFFSET -o $OUTPUT_FILE || abort
-echo "-----------------------------------------------"
-
-# Build zip
-echo "Building zip..."
-echo "-----------------------------------------------"
-cp build/out/boot.img build/out/zip/files/boot.img
-cp build/out/dtbo.img build/out/zip/files/dtbo.img
-cp build/update-binary build/out/zip/META-INF/com/google/android/update-binary
-cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
-pushd build/out/zip > /dev/null
-DATE=`date +"%d-%m-%Y_%H-%M-%S"`
-if [ $KSU -eq 1 ];
+if [ $MODEL != "twrp" ]
 then
-    NAME=ExtremeKernel_UNOFFICIAL_KSU_"$MODEL"_"$DATE".zip
-else
-    NAME=ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip
+    # Build ramdisk
+    echo "Building RAMDisk..."
+    echo "-----------------------------------------------"
+    pushd build/ramdisk > /dev/null
+    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/ramdisk.cpio.gz || abort
+    popd > /dev/null
+    echo "-----------------------------------------------"
+
+    # Create boot image
+    echo "Creating boot image..."
+    echo "-----------------------------------------------"
+    ./toolchain/mkbootimg --base $BASE --board $BOARD --cmdline "$CMDLINE" --dtb $DTB_PATH \
+    --dtb_offset $DTB_OFFSET --hashtype $HASHTYPE --header_version $HEADER_VERSION --kernel $KERNEL_PATH \
+    --kernel_offset $KERNEL_OFFSET --os_patch_level $OS_PATCH_LEVEL --os_version $OS_VERSION --pagesize $PAGESIZE \
+    --ramdisk $RAMDISK --ramdisk_offset $RAMDISK_OFFSET \
+    --second_offset $SECOND_OFFSET --tags_offset $TAGS_OFFSET -o $OUTPUT_FILE || abort
+    echo "-----------------------------------------------"
+
+    # Build zip
+    echo "Building zip..."
+    echo "-----------------------------------------------"
+    cp build/out/boot.img build/out/zip/files/boot.img
+    cp build/out/dtbo.img build/out/zip/files/dtbo.img
+    cp build/update-binary build/out/zip/META-INF/com/google/android/update-binary
+    cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
+    pushd build/out/zip > /dev/null
+    DATE=`date +"%d-%m-%Y_%H-%M-%S"`
+    if [ $KSU -eq 1 ];
+    then
+        NAME=ExtremeKernel_UNOFFICIAL_KSU_"$MODEL"_"$DATE".zip
+    else
+        NAME=ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip
+    fi
+    zip -r ../"$NAME" . || abort
+    popd > /dev/null
+    echo "-----------------------------------------------"
 fi
-zip -r ../"$NAME" . || abort
-popd > /dev/null
-echo "-----------------------------------------------"
 
 echo "Done!"
