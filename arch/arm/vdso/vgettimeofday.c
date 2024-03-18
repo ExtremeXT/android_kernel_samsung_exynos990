@@ -125,7 +125,7 @@ static notrace u64 get_clock_shifted_nsec(const u64 cycle_last,
 
 	isb();
 	/* Read the virtual counter. */
-	res = arch_vdso_read_counter();
+	res = read_sysreg(CNTVCT);
 	res = res - cycle_last;
 	res &= mask;
 	return res * mult;
