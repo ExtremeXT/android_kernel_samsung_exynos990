@@ -57,6 +57,10 @@ c2s)
     KERNEL_DEFCONFIG=extreme_c2sxxx_defconfig
     BOARD=SRPTB27C009KU
 ;;
+r8slte)
+    KERNEL_DEFCONFIG=extreme_r8slte_defconfig
+    BOARD=SRPTF26B014KU
+;;
 twrp)
     KERNEL_DEFCONFIG=twrp_defconfig
     BOARD=SRPSI19A018KU
