@@ -50,6 +50,9 @@ dtbo-y += samsung/exynos990-c2s_eur_openx_00.dtbo
 dtbo-y += samsung/exynos990-c2s_eur_openx_24.dtbo
 dtbo-y += samsung/exynos990-c2s_eur_openx_16.dtbo
 dtbo-y += samsung/exynos990-c2s_eur_openx_17.dtbo
+dtbo-y += samsung/exynos990-r8s_eur_open_00.dtbo
+dtbo-y += samsung/exynos990-r8s_eur_open_02.dtbo
+dtbo-y += samsung/exynos990-r8s_eur_open_05.dtbo
 
 targets += dtbs
 DTB_LIST  := $(dtb-y) $(dtbo-y)
