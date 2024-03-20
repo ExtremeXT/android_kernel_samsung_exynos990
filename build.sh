@@ -66,7 +66,7 @@ twrp)
     BOARD=SRPSI19A018KU
 ;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, twrp"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8slte, twrp"
     exit
 esac
 

@@ -342,6 +342,46 @@ config SOC_EXYNOS9830
 	select PINCTRL
 	select SAMSUNG_DMADEV
 
+config MODEL_X1SLTE
+	bool "Samsung Galaxy S20 4G"
+	depends on SOC_EXYNOS9830
+
+config MODEL_X1S
+	bool "Samsung Galaxy S20 5G"
+	depends on SOC_EXYNOS9830
+
+config MODEL_Y2SLTE
+	bool "Samsung Galaxy S20 Plus 4G"
+	depends on SOC_EXYNOS9830
+
+config MODEL_Y2S
+	bool "Samsung Galaxy S20 Plus 5G"
+	depends on SOC_EXYNOS9830
+
+config MODEL_Z3S
+        bool "Samsung Galaxy S20 Ultra"
+        depends on SOC_EXYNOS9830
+
+config MODEL_C1SLTE
+        bool "Samsung Galaxy Note 20 4G"
+        depends on SOC_EXYNOS9830
+
+config MODEL_C1S
+        bool "Samsung Galaxy Note 20 5G"
+        depends on SOC_EXYNOS9830
+
+config MODEL_C2SLTE
+        bool "Samsung Galaxy Note 20 Ultra 4G"
+        depends on SOC_EXYNOS9830
+
+config MODEL_C2S
+        bool "Samsung Galaxy Note 20 Ultra 5G"
+        depends on SOC_EXYNOS9830
+
+config MODEL_R8SLTE
+        bool "Samsung Galaxy S20 FE"
+        depends on SOC_EXYNOS9830
+
 config SOC_EXYNOS9830_EVT0
 	default n
 	bool "Samsung EXYNOS9830 EVT0"
