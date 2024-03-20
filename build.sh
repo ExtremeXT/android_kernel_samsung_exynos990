@@ -66,7 +66,7 @@ twrp)
     BOARD=SRPSI19A018KU
 ;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8slte, twrp"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, twrp"
     exit
 esac
 
@@ -161,16 +161,7 @@ then
     echo "Building zip..."
     echo "-----------------------------------------------"
     cp build/out/boot.img build/out/zip/files/boot.img
-    ########################################################################
-    # TEMP, Remove this when r8s dtbo is fixed
-    # r8s dtbo doesn't boot at the moment, so copy stock Samsung one for now
-    if [ $MODEL == "r8slte" ]
-    then
-        cp build/dtbo_r8slte.img build/out/zip/files/dtbo.img
-    else
-        cp build/out/dtbo.img build/out/zip/files/dtbo.img
-    fi
-    ########################################################################
+    cp build/out/dtbo.img build/out/zip/files/dtbo.img
     cp build/update-binary build/out/zip/META-INF/com/google/android/update-binary
     cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
     pushd build/out/zip > /dev/null
