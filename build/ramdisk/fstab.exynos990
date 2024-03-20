@@ -4,18 +4,18 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 #<src>  <mnt_point>     <type>  <mnt_flags and options> <fs_mgr_flags>
+system	/system	erofs	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
 system	/system	ext4	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
 system	/system	f2fs	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system	/system	erofs	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
+product	/product	erofs	ro	wait,avb,logical,first_stage_mount
 product	/product	ext4	ro	wait,avb,logical,first_stage_mount
 product	/product	f2fs	ro	wait,avb,logical,first_stage_mount
-product	/product	erofs	ro	wait,avb,logical,first_stage_mount
+vendor	/vendor	erofs	ro	wait,avb,logical,first_stage_mount
 vendor	/vendor	ext4	ro	wait,avb,logical,first_stage_mount
 vendor	/vendor	f2fs	ro	wait,avb,logical,first_stage_mount
-vendor	/vendor	erofs	ro	wait,avb,logical,first_stage_mount
+odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
 odm	/odm	ext4	ro	wait,avb,logical,first_stage_mount
 odm	/odm	f2fs	ro	wait,avb,logical,first_stage_mount
-odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
 
 /dev/block/by-name/prism        /prism                  ext4    ro,barrier=1    nofail,avb,first_stage_mount
 /dev/block/by-name/optics       /optics                 ext4    ro,barrier=1    nofail,avb,first_stage_mount
