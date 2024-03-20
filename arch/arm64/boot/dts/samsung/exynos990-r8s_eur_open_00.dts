@@ -7536,11 +7536,11 @@
 				phandle = <0x45>;
 
 				panel_power_enable {
-					type = "gpio,high\0gpio_lcd_power\0delay,usleep\010000\0gpio,high\0gpio_lcd_rst\0delay,usleep\010000";
+					type = "gpio,high", "gpio_lcd_power", "delay,usleep", "10000", "gpio,high", "gpio_lcd_rst", "delay,usleep", "10000";
 				};
 
 				panel_power_disable {
-					type = "gpio,low\0gpio_lcd_rst\0delay,usleep\010000\0gpio,low\0gpio_lcd_power";
+					type = "gpio,low", "gpio_lcd_rst", "delay,usleep", "10000", "gpio,low", "gpio_lcd_power";
 				};
 			};
 
