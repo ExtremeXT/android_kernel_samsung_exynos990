@@ -34,11 +34,17 @@ G780F - S20 FE (4G) - r8slte
 
 ## Build instructions:
 
-1. Properly clone repository with submodules (KernelSU and toolchains)
+1. Set up build environment as per Google documentation
 
-````git clone --recurse-submodules https://github.com/ExtremeXT/android_kernel_samsung_exynos990.git```
+https://source.android.com/docs/setup/start/requirements
 
-2. Build for your device, optionally with KSU
+	* The `gcc-aarch64-linux-gnu` package is also necessary
+
+2. Properly clone repository with submodules (KernelSU and toolchains)
+
+```git clone --recurse-submodules https://github.com/ExtremeXT/android_kernel_samsung_exynos990.git```
+
+3. Build for your device, optionally with KSU
 
 ```./build.sh x1slte y```
 
