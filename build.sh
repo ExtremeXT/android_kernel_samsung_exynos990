@@ -57,16 +57,15 @@ c2s)
     KERNEL_DEFCONFIG=extreme_c2sxxx_defconfig
     BOARD=SRPTB27C009KU
 ;;
-r8slte)
-    KERNEL_DEFCONFIG=extreme_r8slte_defconfig
+r8s)
+    KERNEL_DEFCONFIG=extreme_r8s_defconfig
     BOARD=SRPTF26B014KU
 ;;
 twrp)
     KERNEL_DEFCONFIG=twrp_defconfig
-    BOARD=SRPSI19A018KU
 ;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8slte, twrp"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp"
     exit
 esac
 
