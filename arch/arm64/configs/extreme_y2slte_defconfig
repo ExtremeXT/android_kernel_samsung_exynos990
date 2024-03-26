@@ -301,7 +301,7 @@ CONFIG_MODEL_Y2SLTE=y
 # CONFIG_MODEL_C1S is not set
 # CONFIG_MODEL_C2SLTE is not set
 # CONFIG_MODEL_C2S is not set
-# CONFIG_MODEL_R8SLTE is not set
+# CONFIG_MODEL_R8S is not set
 
 #
 # Bus support
