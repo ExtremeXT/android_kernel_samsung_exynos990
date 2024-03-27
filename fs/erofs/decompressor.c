@@ -202,7 +202,7 @@ static int z_erofs_lz4_decompress(struct z_erofs_decompress_req *rq, u8 *out,
 	if (rq->partial_decoding || !support_0padding)
 #if defined(CONFIG_ARM64) && defined(CONFIG_KERNEL_MODE_NEON)
 		ret = LZ4_arm64_decompress_safe_partial(src + inputmargin, out,
-				rq->inputsize, rq->outputsize, rq->inplace_io);
+				inlen, rq->outputsize, rq->inplace_io);
 #else
 		ret = LZ4_decompress_safe_partial(src + inputmargin, out,
 						  inlen, rq->outputsize,
@@ -211,7 +211,7 @@ static int z_erofs_lz4_decompress(struct z_erofs_decompress_req *rq, u8 *out,
 	else
 #if defined(CONFIG_ARM64) && defined(CONFIG_KERNEL_MODE_NEON)
 		ret = LZ4_arm64_decompress_safe(src + inputmargin, out,
-					  rq->inputsize, rq->outputsize, rq->inplace_io);
+					  inlen, rq->outputsize, rq->inplace_io);
 #else
 		ret = LZ4_decompress_safe(src + inputmargin, out,
 					  inlen, rq->outputsize);
