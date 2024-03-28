@@ -61,11 +61,17 @@ r8s)
     KERNEL_DEFCONFIG=extreme_r8s_defconfig
     BOARD=SRPTF26B014KU
 ;;
-twrp)
-    KERNEL_DEFCONFIG=twrp_defconfig
+twrp_s20)
+    KERNEL_DEFCONFIG=twrp_s20_defconfig
+;;
+twrp_n20)
+    KERNEL_DEFCONFIG=twrp_n20_defconfig
+;;
+twrp_s20fe)
+    KERNEL_DEFCONFIG=twrp_s20fe_defconfig
 ;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp_s20, twrp_n20, twrp_s20fe"
     exit
 esac
 
@@ -89,7 +95,7 @@ echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
 cp arch/arm64/configs/$KERNEL_DEFCONFIG arch/arm64/configs/temp_defconfig
-if [ $KSU -eq 1 ];
+if [[ $KSU -eq 1 ]];
 then
     sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=y/g' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
@@ -136,7 +142,7 @@ echo "-----------------------------------------------"
 ./toolchain/mkdtimg cfg_create build/out/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
 echo "-----------------------------------------------"
 
-if [ $MODEL != "twrp" ]
+if [[ $MODEL != twrp* ]];
 then
     # Build ramdisk
     echo "Building RAMDisk..."
@@ -165,7 +171,7 @@ then
     cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
     pushd build/out/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
-    if [ $KSU -eq 1 ];
+    if [[ $KSU -eq 1 ]];
     then
         NAME=ExtremeKernel_UNOFFICIAL_KSU_"$MODEL"_"$DATE".zip
     else
