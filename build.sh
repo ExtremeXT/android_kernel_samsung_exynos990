@@ -101,11 +101,11 @@ then
     sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
 fi
-make temp_defconfig || abort
+make O=out -j$CORES temp_defconfig || abort
 echo "-----------------------------------------------"
 echo "Building kernel..."
 echo "-----------------------------------------------"
-make -j$CORES || abort
+make O=out -j$CORES || abort
 echo "-----------------------------------------------"
 
 # Define constant variables
