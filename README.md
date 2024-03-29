@@ -69,4 +69,8 @@ https://source.android.com/docs/setup/start/requirements
 
 ```./build.sh x1slte y```
 
+4. Fetch the flashable zip of the kernel that was just compiled
+
+```build/out/[your_device]/ExtremeKernel...zip```
+
 # To be continued
