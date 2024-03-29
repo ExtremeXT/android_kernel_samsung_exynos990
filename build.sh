@@ -1,3 +1,4 @@
+#!/bin/bash
 cd "$(dirname "$0")"
 
 abort()
@@ -168,7 +169,8 @@ then
     cp build/update-binary build/$MODEL/zip/META-INF/com/google/android/update-binary
     cp build/updater-script build/$MODEL/zip/META-INF/com/google/android/updater-script
 
-    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/$KERNEL_DEFCONFIG   | cut -d '"' -f 2 | tr -d '-')
+    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/$KERNEL_DEFCONFIG | cut -d '"' -f 2)
+    version=${version:1}
     pushd build/$MODEL/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 
