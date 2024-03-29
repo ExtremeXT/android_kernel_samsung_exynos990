@@ -1,7 +1,9 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 
 abort()
 {
+    cd -
     echo "-----------------------------------------------"
     echo "Kernel compilation failed! Exiting..."
     echo "-----------------------------------------------"
@@ -15,9 +17,9 @@ CORES=`cat /proc/cpuinfo | grep -c processor`
 echo "Preparing the build environment..."
 
 rm -rf arch/arm64/configs/temp_defconfig
-rm -rf build/out
-mkdir -p build/out/zip/files
-mkdir -p build/out/zip/META-INF/com/google/android
+rm -rf build/$MODEL
+mkdir -p build/$MODEL/zip/files
+mkdir -p build/$MODEL/zip/META-INF/com/google/android
 
 # Define specific variables
 case $MODEL in
@@ -79,9 +81,6 @@ case $KSU_OPTION in
 y)
     KSU=1
 ;;
-n)
-    KSU=0
-;;
 *)
     KSU=0
 esac
@@ -109,8 +108,8 @@ make -j$CORES || abort
 echo "-----------------------------------------------"
 
 # Define constant variables
-DTB_PATH=build/out/dtb.img
-KERNEL_PATH=build/out/Image
+DTB_PATH=build/$MODEL/dtb.img
+KERNEL_PATH=build/$MODEL/Image
 KERNEL_OFFSET=0x00008000
 DTB_OFFSET=0x00000000
 RAMDISK_OFFSET=0x01000000
@@ -123,23 +122,23 @@ HEADER_VERSION=2
 OS_PATCH_LEVEL=2024-01
 OS_VERSION=14.0.0
 PAGESIZE=2048
-RAMDISK=build/out/ramdisk.cpio.gz
-OUTPUT_FILE=build/out/boot.img
+RAMDISK=build/$MODEL/ramdisk.cpio.gz
+OUTPUT_FILE=build/$MODEL/boot.img
 
 ## Build auxiliary boot.img files
 # Copy kernel to build
-cp arch/arm64/boot/Image build/out
+cp arch/arm64/boot/Image build/$MODEL
 
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/dtb.img build/dtconfigs/exynos9830.cfg -d arch/arm64/boot/dts/exynos || abort
+./toolchain/mkdtimg cfg_create build/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d arch/arm64/boot/dts/exynos || abort
 echo "-----------------------------------------------"
 
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
+./toolchain/mkdtimg cfg_create build/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
 echo "-----------------------------------------------"
 
 if [[ $MODEL != twrp* ]];
@@ -148,7 +147,7 @@ then
     echo "Building RAMDisk..."
     echo "-----------------------------------------------"
     pushd build/ramdisk > /dev/null
-    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/ramdisk.cpio.gz || abort
+    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../$MODEL/ramdisk.cpio.gz || abort
     popd > /dev/null
     echo "-----------------------------------------------"
 
@@ -165,17 +164,20 @@ then
     # Build zip
     echo "Building zip..."
     echo "-----------------------------------------------"
-    cp build/out/boot.img build/out/zip/files/boot.img
-    cp build/out/dtbo.img build/out/zip/files/dtbo.img
-    cp build/update-binary build/out/zip/META-INF/com/google/android/update-binary
-    cp build/updater-script build/out/zip/META-INF/com/google/android/updater-script
-    pushd build/out/zip > /dev/null
+    cp build/$MODEL/boot.img build/$MODEL/zip/files/boot.img
+    cp build/$MODEL/dtbo.img build/$MODEL/zip/files/dtbo.img
+    cp build/update-binary build/$MODEL/zip/META-INF/com/google/android/update-binary
+    cp build/updater-script build/$MODEL/zip/META-INF/com/google/android/updater-script
+
+    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/$KERNEL_DEFCONFIG | cut -d '"' -f 2)
+    version=${version:1}
+    pushd build/$MODEL/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
-    if [[ $KSU -eq 1 ]];
-    then
-        NAME=ExtremeKernel_UNOFFICIAL_KSU_"$MODEL"_"$DATE".zip
+
+    if [[ $KSU -eq 1 ]]; then
+        NAME="$version"_UNOFFICIAL_KSU_"$DATE".zip
     else
-        NAME=ExtremeKernel_UNOFFICIAL_"$MODEL"_"$DATE".zip
+        NAME="$version"_UNOFFICIAL_"$DATE".zip
     fi
     zip -r ../"$NAME" . || abort
     popd > /dev/null
@@ -183,3 +185,4 @@ then
 fi
 
 echo "Done!"
+cd -
