@@ -22,6 +22,13 @@ rm -rf build/out/$MODEL
 mkdir -p build/out/$MODEL/zip/files
 mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
 
+# Apply KSU patch for FBE support
+# Else it'll lose allowlist on reboot
+# Source patch: https://github.com/Unb0rn/android_kernel_samsung_exynos9820/commit/e424dac6ce3f99e128aaabb0711d69adf4079c77
+pushd ./KernelSU > /dev/null
+patch -p1 -t -N  < ../build/KSU.patch > /dev/null
+popd > /dev/null
+
 # Define specific variables
 case $MODEL in
 x1slte)
@@ -100,9 +107,6 @@ then
     sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=y/g' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
-    pushd ./KernelSU > /dev/null
-    patch -p1 --verbose -t -N  < ../KSU.patch > /dev/null
-    popd > /dev/null
 fi
 make O=out -j$CORES temp_defconfig || abort
 echo "-----------------------------------------------"
@@ -131,18 +135,18 @@ OUTPUT_FILE=build/out/$MODEL/boot.img
 
 ## Build auxiliary boot.img files
 # Copy kernel to build
-cp arch/arm64/boot/Image build/out/$MODEL
+cp out/arch/arm64/boot/Image build/out/$MODEL
 
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d arch/arm64/boot/dts/exynos || abort
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d out/arch/arm64/boot/dts/exynos || abort
 echo "-----------------------------------------------"
 
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung || abort
 echo "-----------------------------------------------"
 
 if [[ $MODEL != twrp* ]];
