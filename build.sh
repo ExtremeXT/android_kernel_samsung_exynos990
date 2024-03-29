@@ -1,5 +1,4 @@
 #!/bin/bash
-cd "$(dirname "$0")"
 
 abort()
 {
@@ -16,10 +15,12 @@ CORES=`cat /proc/cpuinfo | grep -c processor`
 
 echo "Preparing the build environment..."
 
+pushd $(dirname "$0") > /dev/null
+
 rm -rf arch/arm64/configs/temp_defconfig
-rm -rf build/$MODEL
-mkdir -p build/$MODEL/zip/files
-mkdir -p build/$MODEL/zip/META-INF/com/google/android
+rm -rf build/out/$MODEL
+mkdir -p build/out/$MODEL/zip/files
+mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
 
 # Define specific variables
 case $MODEL in
@@ -108,8 +109,8 @@ make -j$CORES || abort
 echo "-----------------------------------------------"
 
 # Define constant variables
-DTB_PATH=build/$MODEL/dtb.img
-KERNEL_PATH=build/$MODEL/Image
+DTB_PATH=build/out/$MODEL/dtb.img
+KERNEL_PATH=build/out/$MODEL/Image
 KERNEL_OFFSET=0x00008000
 DTB_OFFSET=0x00000000
 RAMDISK_OFFSET=0x01000000
@@ -122,23 +123,23 @@ HEADER_VERSION=2
 OS_PATCH_LEVEL=2024-01
 OS_VERSION=14.0.0
 PAGESIZE=2048
-RAMDISK=build/$MODEL/ramdisk.cpio.gz
-OUTPUT_FILE=build/$MODEL/boot.img
+RAMDISK=build/out/$MODEL/ramdisk.cpio.gz
+OUTPUT_FILE=build/out/$MODEL/boot.img
 
 ## Build auxiliary boot.img files
 # Copy kernel to build
-cp arch/arm64/boot/Image build/$MODEL
+cp arch/arm64/boot/Image build/out/$MODEL
 
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d arch/arm64/boot/dts/exynos || abort
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d arch/arm64/boot/dts/exynos || abort
 echo "-----------------------------------------------"
 
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d arch/arm64/boot/dts/samsung || abort
 echo "-----------------------------------------------"
 
 if [[ $MODEL != twrp* ]];
@@ -147,7 +148,7 @@ then
     echo "Building RAMDisk..."
     echo "-----------------------------------------------"
     pushd build/ramdisk > /dev/null
-    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../$MODEL/ramdisk.cpio.gz || abort
+    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/$MODEL/ramdisk.cpio.gz || abort
     popd > /dev/null
     echo "-----------------------------------------------"
 
@@ -164,14 +165,14 @@ then
     # Build zip
     echo "Building zip..."
     echo "-----------------------------------------------"
-    cp build/$MODEL/boot.img build/$MODEL/zip/files/boot.img
-    cp build/$MODEL/dtbo.img build/$MODEL/zip/files/dtbo.img
-    cp build/update-binary build/$MODEL/zip/META-INF/com/google/android/update-binary
-    cp build/updater-script build/$MODEL/zip/META-INF/com/google/android/updater-script
+    cp build/out/$MODEL/boot.img build/out/$MODEL/zip/files/boot.img
+    cp build/out/$MODEL/dtbo.img build/out/$MODEL/zip/files/dtbo.img
+    cp build/update-binary build/out/$MODEL/zip/META-INF/com/google/android/update-binary
+    cp build/updater-script build/out/$MODEL/zip/META-INF/com/google/android/updater-script
 
     version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/$KERNEL_DEFCONFIG | cut -d '"' -f 2)
     version=${version:1}
-    pushd build/$MODEL/zip > /dev/null
+    pushd build/out/$MODEL/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 
     if [[ $KSU -eq 1 ]]; then
@@ -184,5 +185,5 @@ then
     echo "-----------------------------------------------"
 fi
 
+popd > /dev/null
 echo "Done!"
-cd -
