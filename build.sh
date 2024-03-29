@@ -101,7 +101,7 @@ then
     sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
     pushd ./KernelSU > /dev/null
-    patch -p1 --verbose -t -N  < ../KSU.patch
+    patch -p1 --verbose -t -N  < ../KSU.patch > /dev/null
     popd > /dev/null
 fi
 make O=out -j$CORES temp_defconfig || abort
