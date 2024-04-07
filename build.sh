@@ -29,6 +29,21 @@ pushd ./KernelSU > /dev/null
 patch -p1 -t -N  < ../build/KSU.patch > /dev/null
 popd > /dev/null
 
+# Define toolchain variables
+PATH=$PWD/toolchain/gcc_4.9/bin:$PWD/toolchain/clang_r416183b/bin:$PATH
+
+MAKE_ARGS="
+LLVM=1 \
+CC=clang \
+SUBARCH=arm64 \
+ARCH=arm64 \
+CROSS_COMPILE=aarch64-linux-androidkernel- \
+CROSS_COMPILE_COMPAT=arm-linux-androidkernel- \
+CLANG_TRIPLE=aarch64-linux-gnu- \
+PLATFORM_VERSION=13 \
+O=out
+"
+
 # Define specific variables
 case $MODEL in
 x1slte)
@@ -108,11 +123,11 @@ then
     sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
     sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
 fi
-make O=out -j$CORES temp_defconfig || abort
+make ${MAKE_ARGS} -j$CORES temp_defconfig || abort
 echo "-----------------------------------------------"
 echo "Building kernel..."
 echo "-----------------------------------------------"
-make O=out -j$CORES || abort
+make ${MAKE_ARGS} -j$CORES || abort
 echo "-----------------------------------------------"
 
 # Define constant variables
