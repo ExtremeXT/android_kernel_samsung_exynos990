@@ -239,7 +239,6 @@ static int f2fs_sec_blockops_dbg(struct f2fs_sb_info *sbi, char *buf, int src_le
 
 	return (len - src_len);
 }
-#endif
 
 /* Copy from debug.c stat_show */
 static ssize_t f2fs_sec_stats_show(struct f2fs_sb_info *sbi, char *buf)
@@ -485,6 +484,8 @@ static void __sec_bigdata_init_value(struct f2fs_sb_info *sbi,
 	}
 }
 
+#endif // CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
+
 static ssize_t f2fs_sbi_show(struct f2fs_attr *a,
 			struct f2fs_sb_info *sbi, char *buf)
 {
@@ -514,7 +515,10 @@ static ssize_t f2fs_sbi_show(struct f2fs_attr *a,
 			len += snprintf(buf + len, PAGE_SIZE - len, "%s\n",
 								extlist[i]);
 		return len;
-	} else if (!strcmp(a->attr.name, "sec_gc_stat")) {
+	}
+
+#ifdef CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
+	else if (!strcmp(a->attr.name, "sec_gc_stat")) {
 		int len = 0;
 
 		len = snprintf(buf, PAGE_SIZE, "\"%s\":\"%llu\",\"%s\":\"%llu\","
@@ -631,6 +635,7 @@ static ssize_t f2fs_sbi_show(struct f2fs_attr *a,
 	} else if (!strcmp(a->attr.name, "sec_stats")) {
 		return f2fs_sec_stats_show(sbi, buf);
 	}
+#endif // CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 
 	ui = (unsigned int *)(ptr + a->offset);
 
@@ -683,7 +688,9 @@ static ssize_t __sbi_store(struct f2fs_attr *a,
 out:
 		up_write(&sbi->sb_lock);
 		return ret ? ret : count;
-	} else if(!strcmp(a->attr.name, "sec_gc_stat")) {
+	} 
+#ifdef CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
+	else if(!strcmp(a->attr.name, "sec_gc_stat")) {
 		__sec_bigdata_init_value(sbi, a->attr.name);
 		return count;
 	} else if (!strcmp(a->attr.name, "sec_io_stat")) {
@@ -706,6 +713,7 @@ out:
 
 		return count;
 	}
+#endif // CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 
 	ui = (unsigned int *)(ptr + a->offset);
 
@@ -934,6 +942,7 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_super_block, extension_list, extension_list);
 F2FS_RW_ATTR(FAULT_INFO_RATE, f2fs_fault_info, inject_rate, inject_rate);
 F2FS_RW_ATTR(FAULT_INFO_TYPE, f2fs_fault_info, inject_type, inject_type);
 #endif
+#ifdef CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_gc_stat, sec_stat);
 F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_io_stat, sec_stat);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_stats, stat_info);
@@ -947,6 +956,7 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_capacity_apps_kb, s_sec_capacity_apps_k
 F2FS_RW_ATTR_640(F2FS_SBI, f2fs_sb_info, sec_defrag_stat, s_sec_part_best_extents);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_fua_mode, s_sec_cond_fua_mode);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, sec_hqm_preserve, sec_hqm_preserve);
+#endif // CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 F2FS_GENERAL_RO_ATTR(dirty_segments);
 F2FS_GENERAL_RO_ATTR(lifetime_write_kbytes);
 F2FS_GENERAL_RO_ATTR(sec_fs_stat);
@@ -1003,6 +1013,7 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(readdir_ra),
 	ATTR_LIST(gc_pin_file_thresh),
 	ATTR_LIST(extension_list),
+#ifdef CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 	ATTR_LIST(sec_gc_stat),
 	ATTR_LIST(sec_io_stat),
 	ATTR_LIST(sec_stats),
@@ -1016,6 +1027,7 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(sec_defrag_stat),
 	ATTR_LIST(sec_fua_mode),
 	ATTR_LIST(sec_hqm_preserve),
+#endif // CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG
 #ifdef CONFIG_F2FS_FAULT_INJECTION
 	ATTR_LIST(inject_rate),
 	ATTR_LIST(inject_type),
