@@ -209,8 +209,6 @@ VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
 
 export srctree objtree VPATH
 
-CCACHE := ccache
-
 # To make sure we do not include .config for any of the *config targets
 # catch them early, and hand them over to scripts/kconfig/Makefile
 # It is allowed to specify more targets when calling make, including
@@ -361,8 +359,8 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
 HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
 HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
 
-HOSTCC       = $(CCACHE) gcc
-HOSTCXX      = $(CCACHE) g++
+HOSTCC       = gcc
+HOSTCXX      = g++
 KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
 		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS) \
 		$(HOSTCFLAGS)
@@ -371,15 +369,15 @@ KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
 KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
 
 # Make variables (CC, etc...)
-AS		= $(CCACHE) $(CROSS_COMPILE)as
-LD		= $(CCACHE) $(CROSS_COMPILE)ld
-CC              = $(CCACHE) $(CROSS_COMPILE)gcc
-CPP		= $(CCACHE) $(CC) -E
-AR		= $(CCACHE) $(CROSS_COMPILE)ar
-NM		= $(CCACHE) $(CROSS_COMPILE)nm
-STRIP		= $(CCACHE) $(CROSS_COMPILE)strip
-OBJCOPY		= $(CCACHE) $(CROSS_COMPILE)objcopy
-OBJDUMP		= $(CCACHE) $(CROSS_COMPILE)objdump
+AS		= $(CROSS_COMPILE)as
+LD		= $(CROSS_COMPILE)ld
+CC              = $(CROSS_COMPILE)gcc
+CPP		= $(CC) -E
+AR		= $(CROSS_COMPILE)ar
+NM		= $(CROSS_COMPILE)nm
+STRIP		= $(CROSS_COMPILE)strip
+OBJCOPY		= $(CROSS_COMPILE)objcopy
+OBJDUMP		=  $(CROSS_COMPILE)objdump
 LEX		= flex
 YACC		= bison
 AWK		= awk
