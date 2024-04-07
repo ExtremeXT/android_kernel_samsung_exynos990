@@ -408,9 +408,6 @@ PYTHON2		= python2
 PYTHON3		= python3
 CHECK		= sparse
 
-READELF        = $(CROSS_COMPILE)readelf
-export READELF
-
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
 NOSTDINC_FLAGS  =
@@ -474,10 +471,6 @@ export KBUILD_ARFLAGS
 # tree rather than in the kernel tree. The kernel tree might
 # even be read-only.
 export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_versions
-
-# Export hardcoded PLATFORM_VERSION
-PLATFORM_VERSION ?= 13
-export PLATFORM_VERSION
 
 # Files to ignore in find ... statements
 
