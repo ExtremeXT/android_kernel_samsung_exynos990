@@ -41,6 +41,7 @@ CROSS_COMPILE=aarch64-linux-androidkernel- \
 CROSS_COMPILE_COMPAT=arm-linux-androidkernel- \
 CLANG_TRIPLE=aarch64-linux-gnu- \
 PLATFORM_VERSION=13 \
+READELF=$PWD/toolchain/clang_r416183b/bin/llvm-readelf \
 O=out
 "
 
