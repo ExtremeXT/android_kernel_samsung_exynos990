@@ -1123,7 +1123,7 @@ static bool __need_flush_quota(struct f2fs_sb_info *sbi)
 #define sec_dbg_start_jiffies(val) val = get_jiffies_64()
 #else
 #define sec_dbg_inc_cnt(entry, type) (0)
-#define sec_dbg_add_time(entry, type, start, end) (0)
+#define sec_dbg_add_time(entry, type, start) (0)
 #define sec_dbg_start_jiffies(val) (0)
 #endif
 /*
