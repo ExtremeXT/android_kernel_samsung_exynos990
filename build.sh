@@ -34,6 +34,7 @@ PATH=$PWD/toolchain/gcc_4.9/bin:$PWD/toolchain/clang_r416183b/bin:$PATH
 
 MAKE_ARGS="
 LLVM=1 \
+LLVM_IAS=1 \
 CC=clang \
 SUBARCH=arm64 \
 ARCH=arm64 \
