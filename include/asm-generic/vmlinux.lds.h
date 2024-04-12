@@ -347,16 +347,6 @@
 #define PG_TRAMP
 #endif
 
-#ifdef CONFIG_UH_RKP
-#define RKP_RO_DATA							\
-	PG_IDMAP								\
-	PG_SWAP									\
-	PG_RESERVED								\
-	PG_TRAMP
-#else
-#define RKP_RO_DATA
-#endif
-
 /*
  * Read only Data
  */
@@ -377,17 +367,6 @@
 		RO_AFTER_INIT_DATA	/* Read only after init */	\
 		*(.rodata1)						\
 	}                                                               \
-	. = ALIGN(4096);				\
-	.rkp_bss          : AT(ADDR(.rkp_bss) - LOAD_OFFSET) {		\
-		*(.rkp_bss.page_aligned)				\
-		*(.rkp_bss)						\
-	} = 0								\
-									\
-	.rkp_ro          : AT(ADDR(.rkp_ro) - LOAD_OFFSET) {		\
-		*(.rkp_ro)						\
-		*(.kdp_ro)						\
-		RKP_RO_DATA	/* Read only after init */	        \
-	}								\
 									\
 	/* PCI quirks */						\
 	.pci_fixup        : AT(ADDR(.pci_fixup) - LOAD_OFFSET) {	\

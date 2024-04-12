@@ -62,30 +62,15 @@
 #include <linux/oom.h>
 #include <linux/compat.h>
 #include <linux/vmalloc.h>
-#include <linux/task_integrity.h>
 
 #include <linux/uaccess.h>
 #include <asm/mmu_context.h>
 #include <asm/tlb.h>
 
 #include <trace/events/task.h>
-#if 0 /* def CONFIG_KDP_NS */
-#include "mount.h"
-#endif
 #include "internal.h"
 
 #include <trace/events/sched.h>
-
-#ifdef CONFIG_SECURITY_DEFEX
-#include <linux/defex.h>
-#endif
-
-#ifdef CONFIG_KDP_CRED
-#define rkp_is_nonroot(x) ((x->cred->type)>>1 & 1)
-#ifdef CONFIG_LOD_SEC
-#define rkp_is_lod(x) ((x->cred->type)>>3 & 1)
-#endif
-#endif
 
 int suid_dumpable = 0;
 
@@ -1050,10 +1035,6 @@ static int exec_mmap(struct mm_struct *mm)
 	activate_mm(active_mm, mm);
 	tsk->mm->vmacache_seqnum = 0;
 	vmacache_flush(tsk);
-#ifdef CONFIG_KDP_CRED
-	if(rkp_cred_enable)
-		uh_call(UH_APP_KDP, RKP_KDP_X43, (u64)current_cred(), (u64)mm->pgd, 0, 0);
-#endif 
 	task_unlock(tsk);
 	if (old_mm) {
 		up_read(&old_mm->mmap_sem);
@@ -1263,110 +1244,6 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec)
 	task_unlock(tsk);
 	perf_event_comm(tsk, exec);
 }
-#if 0 /* def CONFIG_KDP_NS */
-extern int rkp_from_vfsmnt_cache(unsigned long addr);
-extern struct super_block *sys_sb;	/* pointer to superblock */
-extern struct super_block *odm_sb;	/* pointer to superblock */
-extern struct super_block *vendor_sb;	/* pointer to superblock */
-extern struct super_block *rootfs_sb;	/* pointer to superblock */
-extern struct super_block *art_sb;	/* pointer to superblock */
-extern int __is_kdp_recovery;
-extern int __check_verifiedboot;
-static int kdp_check_sb_mismatch(struct super_block *sb) 
-{	
-	if(__is_kdp_recovery || __check_verifiedboot) {
-		return 0;
-	}
-	if((sb != rootfs_sb) && (sb != sys_sb)
-		&& (sb != odm_sb) && (sb != vendor_sb) && (sb != art_sb)) {
-		return 1;
-	}
-	return 0;
-}
-
-static int kdp_check_path_mismatch(struct vfsmount *vfsmnt)
-{
-	int i = 0;
-	int ret = -1;
-	char *buf = NULL;
-	char *path_name = NULL;
-	const char* skip_path[] = {
-		"/com.android.runtime",
-		"/com.android.conscrypt",
-		"/com.android.art",
-		"/com.android.adbd",
-		"/com.android.sdkext",
-	};
-
-	if (!vfsmnt->bp_mount) {
-		printk(KERN_ERR "vfsmnt->bp_mount is NULL");
-		return -ENOMEM;
-	}
-
-	buf = kzalloc(PATH_MAX, GFP_KERNEL);
-	if (!buf)
-		return -ENOMEM;
-
-	path_name = dentry_path_raw(vfsmnt->bp_mount->mnt_mountpoint, buf, PATH_MAX);
-	if (IS_ERR(path_name))
-		goto out;
-
-	for (; i < ARRAY_SIZE(skip_path); ++i) {
-		if (!strncmp(path_name, skip_path[i], strlen(skip_path[i]))) {
-			ret = 0;
-			break;
-		}
-	}
-out:
-	kfree(buf);
-
-	return ret;
-}
-
-/*
-static int invalid_drive(struct linux_binprm * bprm) 
-{
-	struct super_block *sb =  NULL;
-	struct vfsmount *vfsmnt = NULL;
-	
-	vfsmnt = bprm->file->f_path.mnt;
-#ifdef CONFIG_FASTUH_RKP
-	if(!vfsmnt || !rkp_from_vfsmnt_cache((unsigned long)vfsmnt)) {
-#else
-	if(!vfsmnt || !rkp_ro_page((unsigned long)vfsmnt)) {
-#endif
-		printk("\nInvalid Drive #%s# #%p#\n",bprm->filename, vfsmnt);
-		return 1;
-	}
-
-	if (!kdp_check_path_mismatch(vfsmnt)) {
-		return 0;
-	}
-
-	sb = vfsmnt->mnt_sb;
-
-	if(kdp_check_sb_mismatch(sb)) {
-		printk("\n Superblock Mismatch #%s# vfsmnt #%p#sb #%p:%p:%p:%p:%p:%p#\n",
-					bprm->filename, vfsmnt, sb, rootfs_sb, sys_sb, odm_sb, vendor_sb, art_sb);
-		return 1;
-	}
-
-	return 0;
-}
-#define KDP_CRED_SYS_ID 1000
-
-static int is_kdp_priv_task(void)
-{
-	struct cred *cred = (struct cred *)current_cred();
-
-	if(cred->uid.val <= (uid_t)KDP_CRED_SYS_ID || cred->euid.val <= (uid_t)KDP_CRED_SYS_ID ||
-		cred->gid.val <= (gid_t)KDP_CRED_SYS_ID || cred->egid.val <= (gid_t)KDP_CRED_SYS_ID ){
-		return 1;
-	}
-	return 0;
-}
-*/
-#endif
 
 /*
  * Calling this is the point of no return. None of the failures will be
@@ -1397,15 +1274,6 @@ int flush_old_exec(struct linux_binprm * bprm)
 	 * Release all of the old mmap stuff
 	 */
 	acct_arg_size(bprm, 0);
-#if 0 /* def CONFIG_KDP_NS */
-	/*
-	if(rkp_cred_enable &&
-		is_kdp_priv_task() && 
-		invalid_drive(bprm)) {
-		panic("\n KDP_NS: Illegal Execution of file #%s#\n", bprm->filename);
-	}
-	*/
-#endif 
 	retval = exec_mmap(bprm->mm);
 	if (retval)
 		goto out;
@@ -1832,8 +1700,6 @@ static int exec_binprm(struct linux_binprm *bprm)
 		trace_sched_process_exec(current, old_pid, bprm);
 		ptrace_event(PTRACE_EVENT_EXEC, old_vpid);
 		proc_exec_connector(current);
-	} else {
-		task_integrity_delayed_reset(current, CAUSE_EXEC, bprm->file);
 	}
 
 	return ret;
@@ -1892,15 +1758,6 @@ static int __do_execve_file(int fd, struct filename *filename,
 	retval = PTR_ERR(file);
 	if (IS_ERR(file))
 		goto out_unmark;
-
-#ifdef CONFIG_SECURITY_DEFEX
-	retval = task_defex_enforce(current, file, -__NR_execve);
-	if (retval < 0) {
-		bprm->file = file;
-		retval = -EPERM;
-		goto out_unmark;
-	 }
-#endif
 
 	sched_exec();
 
@@ -2121,29 +1978,6 @@ SYSCALL_DEFINE3(execve,
 		const char __user *const __user *, argv,
 		const char __user *const __user *, envp)
 {
-#ifdef CONFIG_KDP_CRED
-	struct filename *path = getname(filename);
-	int error = PTR_ERR(path);
-
-	if(IS_ERR(path))
-		return error;
-
-	if(rkp_cred_enable){
-		uh_call(UH_APP_KDP, RKP_KDP_X4B, (u64)path->name, (u64)current, 0, 0);
-	}
-
-	if(CHECK_ROOT_UID(current) && rkp_cred_enable) {
-		if(rkp_restrict_fork(path)){
-			pr_warn("RKP_KDP Restricted making process. PID = %d(%s) "
-							"PPID = %d(%s)\n",
-			current->pid, current->comm,
-			current->parent->pid, current->parent->comm);
-			putname(path);
-			return -EACCES;
-		}
-	}
-	putname(path);
-#endif
 	return do_execve(getname(filename), argv, envp);
 }
 

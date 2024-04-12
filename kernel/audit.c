@@ -76,12 +76,6 @@
 
 #include "audit.h"
 
-// [ SEC_SELINUX_PORTING_COMMON
-#ifdef CONFIG_PROC_AVC
-#include <linux/proc_avc.h>
-#endif
-// ] SEC_SELINUX_PORTING_COMMON
-
 /* No auditing will take place until audit_initialized == AUDIT_INITIALIZED.
  * (Initialization happens after skb_init is called.) */
 #define AUDIT_DISABLED		-1
@@ -92,19 +86,14 @@ static int	audit_initialized;
 #define AUDIT_OFF	0
 #define AUDIT_ON	1
 #define AUDIT_LOCKED	2
-// [ SEC_SELINUX_PORTING_COMMON
-u32		audit_enabled = AUDIT_ON;
-bool		audit_ever_enabled = !!AUDIT_ON;
-// ] SEC_SELINUX_PORTING_COMMON
+u32		audit_enabled = AUDIT_OFF;
+bool	audit_ever_enabled = !!AUDIT_OFF;
 
 
 EXPORT_SYMBOL_GPL(audit_enabled);
 
 /* Default state when kernel boots without any parameters. */
-// [ SEC_SELINUX_PORTING_COMMON
-// Samsung Change Value from AUDIT_OFF to AUDIT_ON
-static u32	audit_default = AUDIT_ON;
-// ] SEC_SELINUX_PORTING_COMMON
+static u32	audit_default = AUDIT_OFF;
 
 
 /* If auditing cannot proceed, audit_failure selects what happens. */
@@ -558,15 +547,8 @@ static void kauditd_printk_skb(struct sk_buff *skb)
 	struct nlmsghdr *nlh = nlmsg_hdr(skb);
 	char *data = nlmsg_data(nlh);
 
-// [ SEC_SELINUX_PORTING_COMMON
-#ifdef CONFIG_PROC_AVC
-	if (nlh->nlmsg_type != AUDIT_EOE && nlh->nlmsg_type != AUDIT_NETFILTER_CFG)
-		sec_avc_log("%s\n", data);
-#else
 	if (nlh->nlmsg_type != AUDIT_EOE && printk_ratelimit())
 		pr_notice("type=%d %s\n", nlh->nlmsg_type, data);
-#endif
-// ] SEC_SELINUX_PORTING_COMMON
 }
 
 /**
@@ -785,15 +767,6 @@ static int kauditd_send_queue(struct sock *sk, u32 portid,
 				/* no - requeue to preserve ordering */
 				skb_queue_head(queue, skb);
 		} else {
-// [ SEC_SELINUX_PORTING_COMMON
-#ifdef CONFIG_PROC_AVC
-			struct nlmsghdr *nlh = nlmsg_hdr(skb);
-			char *data = nlmsg_data(nlh);
-
-			if (nlh->nlmsg_type != AUDIT_EOE && nlh->nlmsg_type != AUDIT_NETFILTER_CFG)
-				sec_avc_log("%s\n", data);
-#endif
-// ] SEC_SELINUX_PORTING_COMMON
 			/* it worked - drop the extra reference and continue */
 			consume_skb(skb);
 			failed = 0;

@@ -384,17 +384,6 @@ static struct kmem_cache *create_cache(const char *name,
 	s->useroffset = useroffset;
 	s->usersize = usersize;
 
-#ifdef CONFIG_KDP_CRED
-	if (!strncmp(name, CRED_JAR_RO, strlen(CRED_JAR_RO)))
-		s->cred_type = KDP_CRED_JAR;
-	else if (!strncmp(name, TSEC_JAR, strlen(TSEC_JAR)))
-		s->cred_type = KDP_TSEC_JAR;
-	else if (!strncmp(name, VFSMNT_JAR, strlen(VFSMNT_JAR)))
-		s->cred_type = KDP_VFSMNT_JAR;
-	else
-		s->cred_type = 0;
-#endif
-
 	err = init_memcg_params(s, memcg, root_cache);
 	if (err)
 		goto out_free_cache;
@@ -968,9 +957,6 @@ void __init create_boot_cache(struct kmem_cache *s, const char *name,
 		panic("Creation of kmalloc slab %s size=%u failed. Reason %d\n",
 					name, size, err);
 
-#ifdef CONFIG_KDP_CRED
-	s->cred_type = 0;
-#endif
 	s->refcount = -1;	/* Exempt from merging for now */
 }
 

@@ -16,10 +16,6 @@
 #include <linux/refcount.h>
 #include <linux/workqueue.h>
 #include "flask.h"
-#ifdef CONFIG_KDP_CRED
-#include <linux/uh.h>
-#include <linux/kdp.h>
-#endif
 
 #define SECSID_NULL			0x00000000 /* unspecified SID */
 #define SECSID_WILD			0xffffffff /* wildcard SID */
@@ -71,11 +67,7 @@
 
 struct netlbl_lsm_secattr;
 
-#if (defined CONFIG_KDP_CRED && defined CONFIG_SAMSUNG_PRODUCT_SHIP)
-extern int selinux_enabled __kdp_ro;
-#else
 extern int selinux_enabled;
-#endif
 
 /* Policy capabilities */
 enum {
@@ -124,24 +116,14 @@ void selinux_avc_init(struct selinux_avc **avc);
 extern struct selinux_state selinux_state;
 
 #ifdef CONFIG_SECURITY_SELINUX_DEVELOP
-//If the binary is no-ship, selinux_enforcing value can be changed.
-#if (defined CONFIG_KDP_CRED && defined CONFIG_SAMSUNG_PRODUCT_SHIP)
-extern int selinux_enforcing __kdp_ro;
-#else
-extern int selinux_enforcing;
-#endif
 static inline bool enforcing_enabled(struct selinux_state *state)
 {
-	return selinux_enforcing; // SEC_SELINUX_PORTING_COMMON Change to use RKP 
+	return state->enforcing;
 }
 
 static inline void enforcing_set(struct selinux_state *state, bool value)
 {
-#if (defined CONFIG_KDP_CRED && defined CONFIG_SAMSUNG_PRODUCT_SHIP)
-	uh_call(UH_APP_KDP, RKP_KDP_X60, (u64)&selinux_enforcing, (u64)value, 0, 0);
-#else
-	selinux_enforcing = value; // SEC_SELINUX_PORTING_COMMON Change to use RKP 
-#endif
+	state->enforcing = value;
 }
 #else
 static inline bool enforcing_enabled(struct selinux_state *state)
@@ -253,13 +235,7 @@ struct extended_perms {
 };
 
 /* definitions of av_decision.flags */
-// [ SEC_SELINUX_PORTING_COMMON
-#ifdef CONFIG_ALWAYS_ENFORCE
-#define AVD_FLAGS_PERMISSIVE	0x0000
-#else
 #define AVD_FLAGS_PERMISSIVE	0x0001
-#endif
-// ] SEC_SELINUX_PORTING_COMMON
 
 void security_compute_av(struct selinux_state *state,
 			 u32 ssid, u32 tsid,

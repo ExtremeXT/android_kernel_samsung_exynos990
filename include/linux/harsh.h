@@ -5,7 +5,6 @@
 
 #include <linux/sched.h>
 
-//#include <linux/uh.h>
 /* uH_HARSH Command ID */
 enum __HARSH_CMD_ID{
 	HARSH_EVENT_INIT = 0x0,

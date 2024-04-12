@@ -220,9 +220,6 @@ obj-$(CONFIG_SENSORS_TCS3407)	+= optics/
 # Motor
 obj-y                           += motor/
 
-# uH
-obj-$(CONFIG_UH)        += uh/
-
 # streamline
 ifeq ($(CONFIG_GATOR), y)
 	obj-$(CONFIG_GATOR)				+= gator/

@@ -55,12 +55,6 @@
 
 #include <soc/samsung/exynos-adv-tracer.h>
 
-
-#if (defined CONFIG_UH_PDBT) || (defined CONFIG_UH_PDBT_STATIC)
-#include <linux/cpumask.h>
-#include <linux/harsh.h>
-#endif
-
 static const char *handler[]= {
 	"Synchronous Abort",
 	"IRQ",
@@ -553,57 +547,6 @@ void arm64_notify_segfault(unsigned long addr)
 	force_signal_inject(SIGSEGV, code, addr);
 }
 
-#if (defined CONFIG_UH_PDBT) || (defined CONFIG_UH_PDBT_STATIC)
-int harsh_handle_inst(struct pt_regs *regs){
-	struct task_struct *tsk;
-	unsigned int core;
-	pid_t pid;
-
-	harsh_req_t req;
-	cpumask_t cpu_mask;
-
-	unsigned long addr = instruction_pointer(regs);
-	char str[sizeof("00000000 ") * 5 + 2 + 1], *p = str;
-	unsigned int instruction, bad;
-	bad = get_user(instruction, &((u32 *)addr)[0]);
-
-	if (!bad) {
-		p += sprintf(p, "(%08x) " , instruction);
-	} else {
-		p += sprintf(p, "bad PC value");
-		return 1;
-	}
-
-	tsk  = get_current();
-	core = tsk->cpu;
-	pid  = tsk->pid;
-
-	req.instruction = instruction;
-	req.core        = core;
-	req.pid         = pid;
-	strncpy(req.comm, tsk->comm, TASK_COMM_LEN);
-
-	cpumask_clear(&cpu_mask);
-#ifdef CONFIG_UH_PDBT
-	uh_call(UH_APP_HARSH, HARSH_EVENT_UNDEF_INST, (u64)&req, (u64)&cpu_mask, 0, 0);
-#else
-	uh_call(UH_APP_HARSH, HARSH_EVENT_UNDEF_INST_STATIC, (u64)&req, (u64)&cpu_mask, 0, 0);
-#endif
-	/* cpu_mask has cores that EL2 expects to be capable of running this instruction.
-	 * If there is no possible cores to run this instruction. SIGILL will be injected to pc at EL0.
-	 * Otherwise either emulated at EL2 or EL1 is asked to migrate the task to other cluster of cpus.
-	 */
-	if(cpumask_empty(&cpu_mask)){
-		return 1;
-	} else if (cpumask_test_cpu(core, &cpu_mask)){
-		return 0;
-	} else {
-		sched_setaffinity(pid, &cpu_mask);
-		return 0;
-    }
-}
-#endif
-
 #if defined(CONFIG_SEC_DEBUG_FAULT_MSG_ADV)
 asmlinkage void __exception do_undefinstr(struct pt_regs *regs, unsigned int esr)
 #else
@@ -635,9 +578,6 @@ asmlinkage void __exception do_undefinstr(struct pt_regs *regs)
 	}
 #endif
 
-#if (defined CONFIG_UH_PDBT) || (defined CONFIG_UH_PDBT_STATIC)
-	if(harsh_handle_inst(regs))
-#endif
 	force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc);
 	BUG_ON(!user_mode(regs));
 }

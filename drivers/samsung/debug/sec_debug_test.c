@@ -827,11 +827,7 @@ static void simulate_WRITE_RO(char **argv, int argc)
 	unsigned long *ptr;
 
 // Write to function addr will triger a warning by JOPP compiler
-#ifdef CONFIG_RKP_CFP_JOPP
-	ptr = (unsigned long *)__start_rodata;
-#else
 	ptr = (unsigned long *)simulate_WRITE_RO;
-#endif
 	*ptr ^= 0x0;
 }
 

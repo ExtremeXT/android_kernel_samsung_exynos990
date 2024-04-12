@@ -24,9 +24,6 @@
 #include "../is-device-ischain.h"
 #include "is-vender.h"
 #include "votf/camerapp-votf.h"
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-#include <linux/rkp.h>
-#endif
 
 int debug_ddk;
 module_param(debug_ddk, int, 0644);
@@ -2463,10 +2460,6 @@ int __nocfi is_load_ddk_bin(int loadType)
 	struct device *device = &gPtr_lib_support.pdev->dev;
 	/* fixup the memory attribute for every region */
 	ulong lib_addr;
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-	rkp_dynamic_load_t rkp_dyn;
-	static rkp_dynamic_load_t rkp_dyn_before = {0};
-#endif
 	ulong lib_isp = DDK_LIB_ADDR;
 
 #ifdef USE_ONE_BINARY
@@ -2510,23 +2503,6 @@ int __nocfi is_load_ddk_bin(int loadType)
 #endif
 
 	if (loadType == BINARY_LOAD_ALL) {
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-		memset(&rkp_dyn, 0, sizeof(rkp_dyn));
-		rkp_dyn.binary_base = lib_addr;
-		rkp_dyn.binary_size = bin.size;
-		rkp_dyn.code_base1 = memory_attribute[INDEX_ISP_BIN].vaddr;
-		rkp_dyn.code_size1 = memory_attribute[INDEX_ISP_BIN].numpages * PAGE_SIZE;
-#ifdef USE_ONE_BINARY
-		rkp_dyn.type = RKP_DYN_FIMC_COMBINED;
-		rkp_dyn.code_base2 = memory_attribute[INDEX_VRA_BIN].vaddr;
-		rkp_dyn.code_size2 = memory_attribute[INDEX_VRA_BIN].numpages * PAGE_SIZE;
-#else
-		rkp_dyn.type = RKP_DYN_FIMC;
-#endif
-		if (rkp_dyn_before.type)
-			uh_call(UH_APP_RKP, RKP_DYNAMIC_LOAD, RKP_DYN_COMMAND_RM,(u64)&rkp_dyn_before, 0, 0);
-		memcpy(&rkp_dyn_before, &rkp_dyn, sizeof(rkp_dynamic_load_t));
-#endif
 		ret = is_memory_attribute_nxrw(&memory_attribute[INDEX_ISP_BIN]);
 		if (ret) {
 			err_lib("failed to change into NX memory attribute (%d)", ret);
@@ -2554,12 +2530,6 @@ int __nocfi is_load_ddk_bin(int loadType)
 			goto fail;
 		}
 
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-		uh_call(UH_APP_RKP, RKP_DYNAMIC_LOAD, RKP_DYN_COMMAND_INS, (u64)&rkp_dyn, (u64)&ret, 0);
-		if (ret) {
-			err_lib("fail to load verify FIMC in EL2");
-		}
-#else
 		ret = is_memory_attribute_rox(&memory_attribute[INDEX_ISP_BIN]);
 		if (ret) {
 			err_lib("failed to change into EX memory attribute (%d)", ret);
@@ -2572,7 +2542,6 @@ int __nocfi is_load_ddk_bin(int loadType)
 			err_lib("failed to change into EX memory attribute (%d)", ret);
 			return ret;
 		}
-#endif
 #endif
 	} else { /* loadType == BINARY_LOAD_DATA */
 		if ((bin.size > CAMERA_BINARY_DDK_DATA_OFFSET) && (bin.size <= bin_size)) {
@@ -2694,11 +2663,6 @@ int __nocfi is_load_rta_bin(int loadType)
 	os_system_func_t os_system_funcs[100];
 	ulong lib_rta = RTA_LIB_ADDR;
 
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-	rkp_dynamic_load_t rkp_dyn;
-	static rkp_dynamic_load_t rkp_dyn_before = {0};
-#endif
-
 	struct is_memory_attribute rta_memory_attribute = {
 		__pgprot(PTE_RDONLY), PFN_UP(LIB_RTA_CODE_SIZE), lib_rta};
 
@@ -2718,17 +2682,6 @@ int __nocfi is_load_rta_bin(int loadType)
 	}
 
 	if (loadType == BINARY_LOAD_ALL) {
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-		memset(&rkp_dyn, 0, sizeof(rkp_dyn));
-		rkp_dyn.binary_base = lib_rta;
-		rkp_dyn.binary_size = bin.size;
-		rkp_dyn.code_base1 = rta_memory_attribute.vaddr;
-		rkp_dyn.code_size1 = rta_memory_attribute.numpages * PAGE_SIZE;
-		rkp_dyn.type = RKP_DYN_FIMC;
-		if (rkp_dyn_before.type)
-			uh_call(UH_APP_RKP, RKP_DYNAMIC_LOAD, RKP_DYN_COMMAND_RM, (u64)&rkp_dyn_before, 0, 0);
-		memcpy(&rkp_dyn_before, &rkp_dyn, sizeof(rkp_dynamic_load_t));
-#endif
 		ret = is_memory_attribute_nxrw(&rta_memory_attribute);
 		if (ret) {
 			err_lib("failed to change into NX memory attribute (%d)", ret);
@@ -2746,18 +2699,11 @@ int __nocfi is_load_rta_bin(int loadType)
 			ret = -EBADF;
 			goto fail;
 		}
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-		uh_call(UH_APP_RKP, RKP_DYNAMIC_LOAD, RKP_DYN_COMMAND_INS,(u64)&rkp_dyn, (u64)&ret, 0);
-		if (ret) {
-			err_lib("fail to load verify FIMC in EL2");
-		}
-#else
 		ret = is_memory_attribute_rox(&rta_memory_attribute);
 		if (ret) {
 			err_lib("failed to change into EX memory attribute (%d)", ret);
 			return ret;
 		}
-#endif
 
 	} else { /* loadType == BINARY_LOAD_DATA */
 		if ((bin.size > CAMERA_BINARY_RTA_DATA_OFFSET) && (bin.size <= RTA_LIB_SIZE)) {

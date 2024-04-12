@@ -32,9 +32,6 @@
 #include <linux/list_lru.h>
 #include "internal.h"
 #include "mount.h"
-#ifdef CONFIG_KDP_NS
-u8 ns_prot = 0;
-#endif
 
 /*
  * Usage:
@@ -3148,7 +3145,4 @@ void __init vfs_caches_init(void)
 	mnt_init();
 	bdev_cache_init();
 	chrdev_init();
-#ifdef CONFIG_KDP_NS
-	ns_prot = 1;
-#endif
 }

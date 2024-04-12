@@ -23,13 +23,6 @@
 #include <asm/pgtable-hwdef.h>
 #include <asm/pgtable-prot.h>
 
-#ifdef CONFIG_UH
-#include <linux/uh.h>
-#if (defined CONFIG_UH_RKP || defined CONFIG_FASTUH_RKP)
-#include <linux/rkp.h>
-#endif
-#endif
-
 /*
  * VMALLOC range.
  *
@@ -57,9 +50,6 @@ extern void __pmd_error(const char *file, int line, unsigned long val);
 extern void __pud_error(const char *file, int line, unsigned long val);
 extern void __pgd_error(const char *file, int line, unsigned long val);
 
-#ifdef CONFIG_KDP_DMAP
-extern int rkp_cred_enable;
-#endif
 /*
  * ZERO_PAGE is a global shared page that is always zero: used
  * for zero-mapped memory areas etc..
@@ -229,25 +219,7 @@ static inline pmd_t pmd_mkcont(pmd_t pmd)
 
 static inline void set_pte(pte_t *ptep, pte_t pte)
 {
-#ifdef CONFIG_KDP_DMAP
-	/* bug on double mapping */
-	if(rkp_cred_enable)
-		BUG_ON(__pte_to_phys(pte) && rkp_is_pg_dbl_mapped(__pte_to_phys(pte)));
-#endif
-#ifdef CONFIG_UH_RKP
-	if (rkp_is_pg_protected((u64)ptep)) {
-		uh_call(UH_APP_RKP, RKP_WRITE_PGT3, (u64)ptep, pte_val(pte), 0, 0);
-	} else {
-		asm volatile("mov x1, %0\n"
-					"mov x2, %1\n"
-					"str x2, [x1]\n"
-		:
-		: "r" (ptep), "r" (pte)
-		: "x1", "x2", "memory");
-	}
-#else
 	WRITE_ONCE(*ptep, pte);
-#endif
 
 
 	/*
@@ -445,20 +417,7 @@ static inline bool pud_table(pud_t pud) { return true; }
 
 static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
 {
-#ifdef CONFIG_UH_RKP
-     if (rkp_is_pg_protected((u64)pmdp)) {
-         uh_call(UH_APP_RKP, RKP_WRITE_PGT2, (u64)pmdp, pmd_val(pmd), 0, 0);
-     } else {
-         asm volatile("mov x1, %0\n"
-                     "mov x2, %1\n"
-                     "str x2, [x1]\n"
-         :
-         : "r" (pmdp), "r" (pmd)
-         : "x1", "x2", "memory");
-     }
-#else
 	WRITE_ONCE(*pmdp, pmd);
-#endif
 	dsb(ishst);
 	isb();
 }
@@ -510,20 +469,7 @@ static inline void pte_unmap(pte_t *pte) { }
 
 static inline void set_pud(pud_t *pudp, pud_t pud)
 {
-#ifdef CONFIG_UH_RKP
-     if (rkp_is_pg_protected((u64)pudp)) {
-         uh_call(UH_APP_RKP, RKP_WRITE_PGT1, (u64)pudp, pud_val(pud), 0, 0);
-     } else {
-         asm volatile("mov x1, %0\n"
-                     "mov x2, %1\n"
-                     "str x2, [x1]\n"
-         :
-         : "r" (pudp), "r" (pud)
-         : "x1", "x2", "memory");
-     }
-#else
 	WRITE_ONCE(*pudp, pud);
-#endif
 	dsb(ishst);
 	isb();
 }
