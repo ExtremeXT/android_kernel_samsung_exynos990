@@ -30,7 +30,7 @@ patch -p1 -t -N  < ../build/KSU.patch > /dev/null
 popd > /dev/null
 
 # Define toolchain variables
-PATH=$PWD/toolchain/gcc_4.9/bin:$PWD/toolchain/clang_r416183b/bin:$PATH
+PATH=$PWD/toolchain/clang_r416183b/bin:$PATH
 
 MAKE_ARGS="
 LLVM=1 \
@@ -38,9 +38,6 @@ LLVM_IAS=1 \
 CC=clang \
 SUBARCH=arm64 \
 ARCH=arm64 \
-CROSS_COMPILE=aarch64-linux-androidkernel- \
-CROSS_COMPILE_COMPAT=arm-linux-androidkernel- \
-CLANG_TRIPLE=aarch64-linux-gnu- \
 PLATFORM_VERSION=13 \
 READELF=$PWD/toolchain/clang_r416183b/bin/llvm-readelf \
 O=out
