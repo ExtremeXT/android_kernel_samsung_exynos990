@@ -36,7 +36,6 @@ MAKE_ARGS="
 LLVM=1 \
 LLVM_IAS=1 \
 CC=clang \
-SUBARCH=arm64 \
 ARCH=arm64 \
 PLATFORM_VERSION=13 \
 READELF=$PWD/toolchain/clang_r416183b/bin/llvm-readelf \
@@ -50,7 +49,7 @@ x1slte)
     BOARD=SRPSJ28B018KU
 ;;
 x1s)
-    KERNEL_DEFCONFIG=extreme_x1sxxx_defconfig
+    KERNEL_DEFCONFIG=extreme_x1s_defconfig
     BOARD=SRPSI19A018KU
 ;;
 y2slte)
@@ -58,11 +57,11 @@ y2slte)
     BOARD=SRPSJ28A018KU
 ;;
 y2s)
-    KERNEL_DEFCONFIG=extreme_y2sxxx_defconfig
+    KERNEL_DEFCONFIG=extreme_y2s_defconfig
     BOARD=SRPSG12A018KU
 ;;
 z3s)
-    KERNEL_DEFCONFIG=extreme_z3sxxx_defconfig
+    KERNEL_DEFCONFIG=extreme_z3s_defconfig
     BOARD=SRPSI19B018KU
 ;;
 c1slte)
@@ -70,7 +69,7 @@ c1slte)
     BOARD=SRPTC30B009KU
 ;;
 c1s)
-    KERNEL_DEFCONFIG=extreme_c1sxxx_defconfig
+    KERNEL_DEFCONFIG=extreme_c1s_defconfig
     BOARD=SRPTB27D009KU
 ;;
 c2slte)
@@ -78,7 +77,7 @@ c2slte)
     BOARD=SRPTC30A009KU
 ;;
 c2s)
-    KERNEL_DEFCONFIG=extreme_c2sxxx_defconfig
+    KERNEL_DEFCONFIG=extreme_c2s_defconfig
     BOARD=SRPTB27C009KU
 ;;
 r8s)
@@ -101,10 +100,10 @@ esac
 
 case $KSU_OPTION in
 y)
-    KSU=1
+    KSU=ksu.config
 ;;
 *)
-    KSU=0
+    KSU= 
 esac
 
 # Build kernel image
@@ -115,14 +114,7 @@ echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-cp arch/arm64/configs/$KERNEL_DEFCONFIG arch/arm64/configs/temp_defconfig
-if [[ $KSU -eq 1 ]];
-then
-    sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=y/g' arch/arm64/configs/temp_defconfig
-    sed -i '/CONFIG_LOCALVERSION/ s/.$//' arch/arm64/configs/temp_defconfig
-    sed -i '/CONFIG_LOCALVERSION/ s/$/-KSU"/' arch/arm64/configs/temp_defconfig
-fi
-make ${MAKE_ARGS} -j$CORES temp_defconfig || abort
+make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $KSU || abort
 echo "-----------------------------------------------"
 echo "Building kernel..."
 echo "-----------------------------------------------"
