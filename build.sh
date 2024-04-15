@@ -183,15 +183,15 @@ then
     cp build/update-binary build/out/$MODEL/zip/META-INF/com/google/android/update-binary
     cp build/updater-script build/out/$MODEL/zip/META-INF/com/google/android/updater-script
 
-    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/$KERNEL_DEFCONFIG | cut -d '"' -f 2)
+    version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/extreme.config | cut -d '"' -f 2)
     version=${version:1}
     pushd build/out/$MODEL/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 
-    if [[ $KSU -eq 1 ]]; then
-        NAME="$version"_UNOFFICIAL_KSU_"$DATE".zip
+    if [[ $KSU_OPTION -eq "y" ]]; then
+        NAME="$version"_"$MODEL"_UNOFFICIAL_KSU_"$DATE".zip
     else
-        NAME="$version"_UNOFFICIAL_"$DATE".zip
+        NAME="$version"_"$MODEL"_UNOFFICIAL_"$DATE".zip
     fi
     zip -r ../"$NAME" . || abort
     popd > /dev/null
