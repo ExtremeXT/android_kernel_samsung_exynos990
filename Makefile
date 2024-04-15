@@ -979,6 +979,9 @@ LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
 KBUILD_LDFLAGS	+= -z noexecstack
 KBUILD_LDFLAGS	+= $(call ld-option,--no-warn-rwx-segments)
 
+# Link with O3
+KBUILD_LDFLAGS += -O3
+
 ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
 LDFLAGS_vmlinux	+= $(call ld-option, -X,)
 endif
