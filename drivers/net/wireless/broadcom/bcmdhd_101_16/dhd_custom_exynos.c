@@ -156,25 +156,10 @@ dhd_wlan_reset(int onoff)
 {
 	return 0;
 }
-
-#ifndef CONFIG_BCMDHD_PCIE
-extern void (*notify_func_callback)(void *dev_id, int state);
-extern void *mmc_host_dev;
-#endif /* !CONFIG_BCMDHD_PCIE */
-
 static int
 dhd_wlan_set_carddetect(int val)
 {
-#ifndef CONFIG_BCMDHD_PCIE
-	pr_err("%s: notify_func=%p, mmc_host_dev=%p, val=%d\n",
-		__FUNCTION__, notify_func_callback, mmc_host_dev, val);
-
-	if (notify_func_callback) {
-		notify_func_callback(mmc_host_dev, val);
-	} else {
-		pr_warning("%s: Nobody to notify\n", __FUNCTION__);
-	}
-#else
+#ifdef CONFIG_BCMDHD_PCIE
 	if (val) {
 		exynos_pcie_pm_resume(pcie_ch_num);
 	} else {
