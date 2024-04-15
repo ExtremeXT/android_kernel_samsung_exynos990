@@ -658,7 +658,7 @@ const struct file_operations bootdump_io_fops = {
 	.read = bootdump_read,
 };
 
-const struct file_operations *get_bootdump_io_fops()
+const struct file_operations *get_bootdump_io_fops(void)
 {
 	return &bootdump_io_fops;
 }

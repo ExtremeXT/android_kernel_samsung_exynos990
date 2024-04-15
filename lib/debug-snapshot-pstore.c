@@ -43,7 +43,7 @@
 #define DSS_LOGGER_LEVEL_MAX		(4)
 #define DSS_LOGGER_SKIP_COUNT		(4)
 #define DSS_LOGGER_STRING_PAD		(1)
-#define DSS_LOGGER_HEADER_SIZE		(68)
+#define DSS_LOGGER_HEADER_SIZE		(69)
 
 #define DSS_LOG_ID_MAIN			(0)
 #define DSS_LOG_ID_RADIO		(1)

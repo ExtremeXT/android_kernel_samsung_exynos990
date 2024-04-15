@@ -21,7 +21,7 @@ static bool motto_info_initialized;
 static bool motto_work_initialized;
 static struct motto_info motto_envs;
 
-static void sec_print_motto_info() {
+static void sec_print_motto_info(void) {
 	int i = 0;
 	int rr_cnt = motto_envs.rr_cnt < MOTTO_AUI_ARRAY_MAX_SIZE ? motto_envs.rr_cnt : MOTTO_AUI_ARRAY_MAX_SIZE;
 	printk("%s: ++\n", __func__);
@@ -114,7 +114,7 @@ static char *motto_strtok(char *_Str, char *_Delim) {
 	return _Str;
 }
 
-static void sec_motto_param_data_clear() {
+static void sec_motto_param_data_clear(void) {
 	int i = 0;
 	int rr_cnt = motto_envs.rr_cnt < MOTTO_AUI_ARRAY_MAX_SIZE ? motto_envs.rr_cnt : MOTTO_AUI_ARRAY_MAX_SIZE;
 	for (i = 0; i < rr_cnt; i++) {

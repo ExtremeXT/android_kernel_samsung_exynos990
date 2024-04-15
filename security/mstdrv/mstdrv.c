@@ -865,7 +865,7 @@ static DEVICE_ATTR(support, 0444, show_support, store_support);
 
 /* mfc_charger node */
 #if defined(CONFIG_MFC_CHARGER)
-static int mfc_get_chip_id()
+static int mfc_get_chip_id(void)
 {
 	u8 chip_id = 0;
 	int retry_cnt = 3;

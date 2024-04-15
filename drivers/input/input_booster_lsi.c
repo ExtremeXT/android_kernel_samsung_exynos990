@@ -123,7 +123,7 @@ void input_booster_init_vendor(int* release_val)
 	init_input_emstune();
 }
 
-void input_booster_exit_vendor()
+void input_booster_exit_vendor(void)
 {
 	pm_qos_remove_request(&cluster2_qos);
 	pm_qos_remove_request(&cluster1_qos);

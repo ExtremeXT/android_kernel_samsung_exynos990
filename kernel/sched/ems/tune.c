@@ -117,7 +117,7 @@ void emstune_mode_change(int next_mode_idx)
 	mutex_unlock(&emstune_mode_lock);
 }
 
-int emstune_get_cur_mode()
+int emstune_get_cur_mode(void)
 {
 	return cur_mode->idx;
 }

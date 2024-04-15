@@ -581,7 +581,7 @@ const struct file_operations ipc_io_fops = {
 	.read = ipc_read,
 };
 
-const struct file_operations *get_ipc_io_fops()
+const struct file_operations *get_ipc_io_fops(void)
 {
 	return &ipc_io_fops;
 }

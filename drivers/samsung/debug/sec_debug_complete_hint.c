@@ -46,7 +46,7 @@ void secdbg_hint_save_complete_hint(struct secdbg_hint *hint)
 	hint->hint_idx++;
 }
 
-void secdbg_hint_display_complete_hint()
+void secdbg_hint_display_complete_hint(void)
 {
 	int i, j;
 	char buf[LOG_LINE_MAX];

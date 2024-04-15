@@ -394,14 +394,14 @@ static void fsr_print_cx(struct fsr_sidekey_info *info)
 	snprintf(pTmp, 8, "       ");
 	strncat(pStr, pTmp, 8);
 	for (i = 0; i < 6; i++) {
-		snprintf(pTmp, 8, "  CH%02d  ", ChannelName[i]);
+		snprintf(pTmp, sizeof(pTmp), "  CH%02d  ", ChannelName[i]);
 		strncat(pStr, pTmp, 8);
 	}
 	input_raw_info(true, &info->client->dev, "%s: %s\n", __func__, pStr);
 
 	memset(pStr, 0x0, BUFFER_MAX);
 	for (i = 0; i < 7; i++) {
-		snprintf(pTmp, 8, "-------");
+		snprintf(pTmp, sizeof(pTmp), "-------");
 		strncat(pStr, pTmp, 8);
 	}
 	input_raw_info(true, &info->client->dev, "%s: %s\n", __func__, pStr);
