@@ -86,6 +86,9 @@ modules.builtin
 !.cocciconfig
 !.clang-format
 
+# SEC firmware files
+!/firmware/
+
 #
 # Generated include files
 #
@@ -134,4 +137,4 @@ all.config
 *.kdev4
 
 # Clang toolchain
-/toolchain/neutron_18/*
+/toolchain/neutron_18/
