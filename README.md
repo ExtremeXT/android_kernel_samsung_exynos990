@@ -5,12 +5,12 @@
 - Linux 4.19.87
 - OneUI 5.1 and OneUI 6.0 support
 - Supports all Exynos 990 devices
-- Compiled with aarch64 GCC 4.1 and Clang 12 compilers
+- Compiled with Neutron Clang 18 + LLVM/LLVM_IAS and arhitecture optimization
 - Optional KernelSU (version 11682) with hiding mechanisms proted from GKI kernels
 - Based on the latest Samsung source for Exynos 990
 - Fixed all compilation warnings and some Samsung bugs
 - Disabled Samsung's anti-rooting protection
-- Disabled some useless logging functions
+- Disabled most of Samsung's senseless logging and debugging
 - Enabled all TCP Scheduling Algorithms, CPU Governors and I/O Schedulers available in the source
 - SELinux Enforcing
 - Boeffla Wakelock Blocker support with a decent default list
@@ -18,7 +18,7 @@
 - Charging Bypass support
 - LZ4 ZRAM compression by default
 - Backported the Timer Events Oriented (TEO) Governor from 5.x kernel
-- Backported VDSO from upstream 4.19-stable kernel
+- Backported VDSO(32) from upstream 4.19-stable kernel
 - Backported latest LZ4 1.9.4 module with ARM64v8 optimizations
 - Backported IncrementalFS (https://source.android.com/docs/core/architecture/kernel/incfs) from latest 4.19-stable (Requires ROM support)
 - Backported FUSE Passthrough (Requires ROM support)
@@ -26,6 +26,7 @@
 - Various network optimizations and touch latency tweaks
 - Various stability/optimization backports from newer Android kernel versions
 - Various general architecture patches, CPU improvements, memory management improvements etc
+- Various other backports from newer kernel versions
 - Easy to modify and compile for developers
 - Optimized for a balance between performance, battery life and low thermals
 - Fully open source with a clean commit history
