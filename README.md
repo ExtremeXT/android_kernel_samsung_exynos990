@@ -59,7 +59,7 @@ G780F - S20 FE (4G) - r8s
 
 https://source.android.com/docs/setup/start/requirements
 
-* The `gcc-aarch64-linux-gnu` and `ccache` packages are also necessary
+* The `libarchive-tools` package is also necessary to patch the toolchain.
 
 2. Properly clone repository with submodules (KernelSU and toolchains)
 
