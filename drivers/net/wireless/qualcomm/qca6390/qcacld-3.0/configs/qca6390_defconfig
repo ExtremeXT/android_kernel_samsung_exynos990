@@ -232,8 +232,8 @@ ifneq ($(CONFIG_ROME_IF),sdio)
 	#Flag to enable DISA
 	CONFIG_WLAN_FEATURE_DISA := y
 
-	#Flag to enable FIPS
-	CONFIG_WLAN_FEATURE_FIPS := y
+	#Flag to disable FIPS
+	CONFIG_WLAN_FEATURE_FIPS := n
 
 	#Flag to enable Fast Path feature
 	ifneq ($(CONFIG_LITHIUM), y)
