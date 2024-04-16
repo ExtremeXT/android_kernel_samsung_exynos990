@@ -19,10 +19,7 @@
 #include <linux/debug-snapshot.h>
 #include <linux/soc/samsung/exynos-soc.h>
 #include <linux/sched/clock.h>
-
-#ifdef CONFIG_DEBUG_FS
 #include <linux/debugfs.h>
-#endif // CONFIG_DEBUG_FS
 
 #include "acpm.h"
 #include "acpm_ipc.h"

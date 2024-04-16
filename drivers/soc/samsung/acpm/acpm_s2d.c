@@ -160,6 +160,7 @@ static int exynos_acpm_s2d_probe(struct platform_device *pdev)
 
 	exynos_acpm_s2d_update_en();
 
+#ifdef CONFIG_DEBUG_FS
 	s2d_dbg_root = debugfs_create_dir("scan2dram", NULL);
 	if (!s2d_dbg_root) {
 		pr_err("%s %s: could not create debugfs root dir\n",
@@ -167,20 +168,24 @@ static int exynos_acpm_s2d_probe(struct platform_device *pdev)
 		ret = -ENOMEM;
 		goto err_dbgfs_probe;
 	}
+#endif
 
 	acpm_s2d->fops.open = simple_open;
 	acpm_s2d->fops.read = exynos_s2d_en_dbg_read;
 	acpm_s2d->fops.write = exynos_s2d_en_dbg_write;
 	acpm_s2d->fops.llseek = default_llseek;
+#ifdef CONFIG_DEBUG_FS
 	acpm_s2d->den = debugfs_create_file("enable", 0644, s2d_dbg_root,
 			NULL, &acpm_s2d->fops);
-
+#endif
 	platform_set_drvdata(pdev, acpm_s2d);
 
 	return 0;
 
+#ifdef CONFIG_DEBUG_FS
 err_dbgfs_probe:
 	kfree(acpm_s2d);
+#endif
 err_s2d_info:
 	return ret;
 }
@@ -190,7 +195,9 @@ static int exynos_acpm_s2d_remove(struct platform_device *pdev)
 	struct scan2dram_info *acpm_s2d = platform_get_drvdata(pdev);
 
 	acpm_ipc_release_channel(acpm_s2d->np, acpm_s2d->ch);
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove_recursive(s2d_dbg_root);
+#endif
 	kfree(acpm_s2d);
 	platform_set_drvdata(pdev, NULL);
 

@@ -1440,7 +1440,9 @@ static const struct file_operations wakeup_sources_stats_fops = {
 };
 
 #ifdef CONFIG_SEC_PM_DEBUG
+#ifdef CONFIG_DEBUG_FS
 static struct dentry *wakelock_screen_off_dentry;
+#endif /* CONFIG_DEBUG_FS */
 
 static int print_wakelock_screen_off(struct seq_file *m,
 				     struct wakeup_source *ws)
@@ -1516,14 +1518,20 @@ static int __init wakeup_sources_init(void)
 {
 #ifdef CONFIG_DEBUG_FS
 	debugfs_create_file("wakeup_sources", S_IRUGO, NULL, NULL, &wakeup_sources_stats_fops);
-#elif defined(CONFIG_PROC_FS)
-	proc_create("wakelocks", S_IRUGO, NULL, &wakeup_sources_stats_fops);
-#endif
+
 #ifdef CONFIG_SEC_PM_DEBUG
 	wakelock_screen_off_dentry = debugfs_create_file("wakelock_screen_off",
 			0444, NULL, NULL, &wakelock_screen_off_fops);
+#endif /* CONFIG_SEC_PM_DEBUG */
+
+#elif defined(CONFIG_PROC_FS)
+	proc_create("wakelocks", S_IRUGO, NULL, &wakeup_sources_stats_fops);
+#endif /* CONFIG_DEBUG_FS */
+
+#ifdef CONFIG_SEC_PM_DEBUG
 	fb_register_client(&fb_block);
-#endif
+#endif /* CONFIG_SEC_PM_DEBUG */
+
 	return 0;
 }
 
