@@ -2360,7 +2360,6 @@ int vl53l5_k_power_onoff(struct vl53l5_k_module_t *data,
     struct regulator *vdd_vreg, const char *vdd_reg_name, bool on)
 {
 	int ret = 0;
-	int voltage = 0;
 	int reg_enabled = 0;
 
 	if (vdd_reg_name) {
@@ -2374,9 +2373,8 @@ int vl53l5_k_power_onoff(struct vl53l5_k_module_t *data,
 	}
 
 	if (vdd_vreg) {
-		voltage = regulator_get_voltage(vdd_vreg);
 		reg_enabled = regulator_is_enabled(vdd_vreg);
-		vl53l5_k_log_info("vdd_reg reg_enabled=%d voltage=%d\n", reg_enabled, voltage);
+		vl53l5_k_log_info("vdd_reg reg_enabled=%d voltage=%d\n", reg_enabled, regulator_get_voltage(vdd_vreg));
 
 		if (on) {
 			if (reg_enabled == 0) {

@@ -307,7 +307,7 @@ struct poc_partition {
 	u32 magicnum_size;
 
 	/* properties */
-	int need_preload:1;
+	bool need_preload;
 
 	/* result */
 	bool preload_done;
