@@ -17,6 +17,29 @@ echo "Preparing the build environment..."
 
 pushd $(dirname "$0") > /dev/null
 
+# Define toolchain variables
+CLANG_DIR=$PWD/toolchain/neutron_18
+PATH=$CLANG_DIR/bin:$PATH
+
+# Check if toolchain exists
+if [ ! -f "$CLANG_DIR/bin/clang-18" ]; then
+    echo "-----------------------------------------------"
+    echo "Toolchain not found! Downloading..."
+    echo "-----------------------------------------------"
+    rm -rf $CLANG_DIR
+    mkdir -p $CLANG_DIR
+    pushd toolchain/neutron_18 > /dev/null
+    bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") -S=05012024
+    echo "-----------------------------------------------"
+    echo "Patching toolchain..."
+    echo "-----------------------------------------------"
+    bash <(curl -s "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman") --patch=glibc
+    echo "-----------------------------------------------"
+    echo "Cleaning up..."
+    popd > /dev/null
+    echo "-----------------------------------------------"
+fi
+
 rm -rf arch/arm64/configs/temp_defconfig
 rm -rf build/out/$MODEL
 mkdir -p build/out/$MODEL/zip/files
@@ -29,16 +52,12 @@ pushd ./KernelSU > /dev/null
 patch -p1 -t -N  < ../build/KSU.patch > /dev/null
 popd > /dev/null
 
-# Define toolchain variables
-PATH=$PWD/toolchain/clang_r416183b/bin:$PATH
-
 MAKE_ARGS="
 LLVM=1 \
 LLVM_IAS=1 \
 CC=clang \
 ARCH=arm64 \
-PLATFORM_VERSION=13 \
-READELF=$PWD/toolchain/clang_r416183b/bin/llvm-readelf \
+READELF=$CLANG_DIR/bin/llvm-readelf \
 O=out
 "
 
