@@ -652,23 +652,6 @@ static void __init rkp_robuffer_init(void)
 #endif
 
 #ifdef CONFIG_KDP_CRED
-#define VERITY_PARAM_LENGTH 20
-static char verifiedbootstate[VERITY_PARAM_LENGTH];
-int __check_verifiedboot __kdp_ro = 0;
-#if (defined CONFIG_KDP_CRED && defined CONFIG_SAMSUNG_PRODUCT_SHIP)
-extern int selinux_enforcing __kdp_ro;
-extern int ss_initialized __kdp_ro;
-#endif
-static int __init verifiedboot_state_setup(char *str)
-{
-	strlcpy(verifiedbootstate, str, sizeof(verifiedbootstate));
-
-	if(!strncmp(verifiedbootstate, "orange", sizeof("orange")))
-		__check_verifiedboot = 1;
-
-	return 0;
-}
-__setup("androidboot.verifiedbootstate=", verifiedboot_state_setup);
 
 void kdp_init(void)
 {

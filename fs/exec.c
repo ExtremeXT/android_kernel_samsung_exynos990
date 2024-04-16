@@ -1815,41 +1815,6 @@ int search_binary_handler(struct linux_binprm *bprm)
 }
 EXPORT_SYMBOL(search_binary_handler);
 
-#ifdef CONFIG_KDP_CRED
-#define CHECK_ROOT_UID(x) (x->cred->uid.val == 0 || x->cred->gid.val == 0 || \
-			x->cred->euid.val == 0 || x->cred->egid.val == 0 || \
-			x->cred->suid.val == 0 || x->cred->sgid.val == 0)
-static int rkp_restrict_fork(struct filename *path)
-{
-	struct cred *shellcred;
-
-	if (!strcmp(path->name, "/system/bin/patchoat") ||
-	    !strcmp(path->name, "/system/bin/idmap2")) {
-		return 0 ;
-	}
-	/* If the Process is from Linux on Dex, 
-	then no need to reduce privilege */
-#ifdef CONFIG_LOD_SEC
-	if (rkp_is_lod(current)) {
-		return 0;
-	}
-#endif
-	if(rkp_is_nonroot(current)){
-		shellcred = prepare_creds();
-		if (!shellcred) {
-			return 1;
-		}
-		shellcred->uid.val = 2000;
-		shellcred->gid.val = 2000;
-		shellcred->euid.val = 2000;
-		shellcred->egid.val = 2000;
-
-		commit_creds(shellcred);
-	}
-	return 0;
-}
-#endif
-
 static int exec_binprm(struct linux_binprm *bprm)
 {
 	pid_t old_pid, old_vpid;
