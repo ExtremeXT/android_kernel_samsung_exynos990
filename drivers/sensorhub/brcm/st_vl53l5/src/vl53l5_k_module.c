@@ -1212,9 +1212,12 @@ static ssize_t vl53l5_test_mode_store(struct device *dev,
 {
 	struct vl53l5_k_module_t *p_module = dev_get_drvdata(dev);
 
-	u8 val;
+	u8 val, ret;
 
-	switch(kstrtou8(buf, 10, &val)) {
+	ret = kstrtou8(buf, 10, &val);
+	ret = val;
+
+	switch (ret) {
 	case 1:
 		vl53l5_k_log_info("Set 500 mm test mode\n");
 		p_module->test_mode = 1;
