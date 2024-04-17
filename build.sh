@@ -87,8 +87,8 @@ while [[ $# -gt 0 ]]; do
 Usage: $(basename "$0") [options]
 Options:
     -m, --model [value]    Specify the model code of the phone
-    -k, --ksu [Y/n]        Include Kernel Su (Y/n)
-    -d, --debug [Y/n]      Display outputs on seperate lines
+    -k, --ksu [N/y]        Include Kernel Su
+    -d, --debug [N/y]      Display outputs on seperate lines
 EOF
             exit 1
             ;;
@@ -153,13 +153,19 @@ r8s)
     BOARD=SRPTF26B014KU
 ;;
 twrp_s20)
-    KERNEL_DEFCONFIG="twrp_s20_defconfig twrp.config"
+    KERNEL_DEFCONFIG=twrp_s20_defconfig
+    TWRP_CONFIG=twrp.config
+    KSU_OPTION=n
 ;;
 twrp_n20)
-    KERNEL_DEFCONFIG="twrp_n20_defconfig twrp.config"
+    KERNEL_DEFCONFIG=twrp_n20_defconfig
+    TWRP_CONFIG=twrp.config
+    KSU_OPTION=n
 ;;
 twrp_s20fe)
-    KERNEL_DEFCONFIG="twrp_s20fe_defconfig twrp.config"
+    KERNEL_DEFCONFIG=twrp_s20fe_defconfig
+    TWRP_CONFIG=twrp.config
+    KSU_OPTION=n
 ;;
 *)
     echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp_s20, twrp_n20, twrp_s20fe"
@@ -167,15 +173,13 @@ twrp_s20fe)
 esac
 
 if [ -z $KSU_OPTION ]; then
-    read -p "Include Kernel Su (Y/n): " KSU_OPTION
+    read -p "Include Kernel Su (N/y): " KSU_OPTION
 fi
 
 case $KSU_OPTION in
 y)
     KSU=ksu.config
 ;;
-*)
-    KSU= 
 esac
 
 
@@ -188,12 +192,17 @@ mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
 # Build kernel image
 echo "-----------------------------------------------"
 echo "Defconfig: "$KERNEL_DEFCONFIG""
-echo "KSU: "$KSU""
+if [ -z "$KSU" ]; then
+    echo "KSU: N"
+else
+    echo "KSU: $KSU"
+fi
+
 echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $KSU 2>&1"
+run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $TWRP_CONFIG $KSU 2>&1"
 
 echo "Building kernel..."
 echo "-----------------------------------------------"
@@ -277,4 +286,4 @@ then
 fi
 
 popd > /dev/null
-echo "Done!"
+echo "Done! Output Directory: build/out/$MODEL/"
