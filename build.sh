@@ -17,6 +17,7 @@ Options:
     -m, --model [value]    Specify the model code of the phone
     -k, --ksu [y/N]        Include KernelSU
     -r, --recovery [y/N]   Compile kernel for an Android Recovery
+    -c, --ccache [y/N]     Use ccache to cache compilations
 EOF
 }
 
@@ -32,6 +33,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --recovery|-r)
             RECOVERY_OPTION="$2"
+            shift 2
+            ;;
+        --ccache|-c)
+            CCACHE_OPTION="$2"
             shift 2
             ;;
         *)\
@@ -75,10 +80,15 @@ pushd ./KernelSU > /dev/null
 patch -p1 -t -N  < ../build/KSU.patch > /dev/null
 popd > /dev/null
 
+if [[ "$CCACHE_OPTION" == "y" ]]; then
+    CCACHE=ccache
+fi
+
 MAKE_ARGS="
 LLVM=1 \
 LLVM_IAS=1 \
 ARCH=arm64 \
+CCACHE=$CCACHE \
 O=out
 "
 
