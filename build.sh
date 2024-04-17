@@ -1,4 +1,5 @@
 #!/bin/bash
+
 abort()
 {
     cd -
@@ -8,23 +9,42 @@ abort()
     exit -1
 }
 
-run_command() {
-
-    local command="$@"
-    if [[ "$DEBUG" == "y" ]]; then
-        $command 2>&1 || abort
-        echo "-----------------------------------------------"
-    else
-        $command > >(while IFS= read -r line; do printf '\r%*s\r%s' "$(tput cols)" '' "$line"; done) 2>&1 || abort
-        echo -ne "\r\033[K"
-    fi
+unset_flags()
+{
+    cat << EOF
+Usage: $(basename "$0") [options]
+Options:
+    -m, --model [value]    Specify the model code of the phone
+    -k, --ksu [y/N]        Include KernelSU
+    -r, --recovery [y/N]   Compile kernel for an Android Recovery
+EOF
 }
 
-CORES=`cat /proc/cpuinfo | grep -c processor`
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --model|-m)
+            MODEL="$2"
+            shift 2
+            ;;
+        --ksu|-k)
+            KSU_OPTION="$2"
+            shift 2
+            ;;
+        --recovery|-r)
+            RECOVERY_OPTION="$2"
+            shift 2
+            ;;
+        *)\
+            unset_flags
+            exit 1
+            ;;
+    esac
+done
 
 echo "Preparing the build environment..."
 
 pushd $(dirname "$0") > /dev/null
+CORES=`cat /proc/cpuinfo | grep -c processor`
 
 # Define toolchain variables
 CLANG_DIR=$PWD/toolchain/neutron_18
@@ -48,8 +68,6 @@ if [ ! -f "$CLANG_DIR/bin/clang-18" ]; then
     popd > /dev/null
 fi
 
-
-
 # Apply KSU patch for FBE support
 # Else it'll lose allowlist on reboot
 # Source patch: https://github.com/Unb0rn/android_kernel_samsung_exynos9820/commit/e424dac6ce3f99e128aaabb0711d69adf4079c77
@@ -60,56 +78,9 @@ popd > /dev/null
 MAKE_ARGS="
 LLVM=1 \
 LLVM_IAS=1 \
-CC=clang \
 ARCH=arm64 \
-READELF=$CLANG_DIR/bin/llvm-readelf \
 O=out
 "
-
-#Get flags if supplied
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --model|-m)
-            MODEL="$2"
-            shift 2
-            ;;
-        --ksu|-k)
-            KSU_OPTION="$2"
-            shift 2
-            ;;
-        --debug|-d)
-            DEBUG="$2"
-            shift 2
-            ;;
-        --recovery|-r)
-            RECOVERY_OPTION="$2"
-            shift 2
-            ;;
-        *)
-            cat << EOF
-Usage: $(basename "$0") [options]
-Options:
-    -m, --model [value]    Specify the model code of the phone
-    -k, --ksu [N/y]        Include Kernel Su
-    -r, --recovery [N/y]   Compile kernel for an android recovery
-    -d, --debug [N/y]      Display outputs on seperate lines
-EOF
-            exit 1
-            ;;
-    esac
-done
-
-if [ -z $MODEL ]; then
-    cat << EOF
-Select a model:
-    x1s         x1slte
-    y2s         y2slte
-    c1s         c1slte
-    c2s         c2slte
-    z3s         r8s
-EOF
-    read -p "Enter your choice (c2s, c1s, c2slte): " MODEL
-fi
 
 # Define specific variables
 KERNEL_DEFCONFIG=extreme_"$MODEL"_defconfig
@@ -145,7 +116,7 @@ r8s)
     BOARD=SRPTF26B014KU
 ;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s"
+    unset_flags
     exit
 esac
 
@@ -155,19 +126,17 @@ if [[ "$RECOVERY_OPTION" == "y" ]]; then
 fi
 
 if [ -z $KSU_OPTION ]; then
-    read -p "Include Kernel Su (N/y): " KSU_OPTION
+    read -p "Include KernelSU (y/N): " KSU_OPTION
 fi
 
 if [[ "$KSU_OPTION" == "y" ]]; then
     KSU=ksu.config
 fi
 
-
 rm -rf arch/arm64/configs/temp_defconfig
 rm -rf build/out/$MODEL
 mkdir -p build/out/$MODEL/zip/files
 mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
-
 
 # Build kernel image
 echo "-----------------------------------------------"
@@ -187,11 +156,11 @@ echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $RECOVERY $KSU 2>&1"
+make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $RECOVERY $KSU
 
 echo "Building kernel..."
 echo "-----------------------------------------------"
-run_command "make ${MAKE_ARGS} -j$CORES"
+make ${MAKE_ARGS} -j$CORES
 
 # Define constant variables
 DTB_PATH=build/out/$MODEL/dtb.img
@@ -218,12 +187,12 @@ cp out/arch/arm64/boot/Image build/out/$MODEL
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
 echo "-----------------------------------------------"
-run_command "./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d out/arch/arm64/boot/dts/exynos"
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d out/arch/arm64/boot/dts/exynos
 
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-run_command "./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung"
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung
 
 if [ -z "$RECOVERY" ]; then
     # Build ramdisk
@@ -261,13 +230,9 @@ if [ -z "$RECOVERY" ]; then
     else
         NAME="$version"_"$MODEL"_UNOFFICIAL_"$DATE".zip
     fi
-    if [[ "$DEBUG" == "y" ]]; then
-        zip -r ../"$NAME" .
-    else
-        zip -r -qq ../"$NAME" .
-    fi
+    zip -r -qq ../"$NAME" .
     popd > /dev/null
 fi
 
 popd > /dev/null
-echo "Done! Output Directory: build/out/$MODEL/"
+echo "Build finished successfully!"
