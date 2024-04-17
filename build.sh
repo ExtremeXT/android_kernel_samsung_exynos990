@@ -81,13 +81,17 @@ while [[ $# -gt 0 ]]; do
             DEBUG="$2"
             shift 2
             ;;
+        --recovery|-r)
+            RECOVERY_OPTION="$2"
+            shift 2
+            ;;
         *)
-
             cat << EOF
 Usage: $(basename "$0") [options]
 Options:
     -m, --model [value]    Specify the model code of the phone
     -k, --ksu [N/y]        Include Kernel Su
+    -r, --recovery [N/y]   Compile kernel for an android recovery
     -d, --debug [N/y]      Display outputs on seperate lines
 EOF
             exit 1
@@ -103,84 +107,60 @@ Select a model:
     c1s         c1slte
     c2s         c2slte
     z3s         r8s
-    twrp_s20    twrp_s20fe
-    twrp_n20
-
 EOF
     read -p "Enter your choice (c2s, c1s, c2slte): " MODEL
 fi
 
 # Define specific variables
+KERNEL_DEFCONFIG=extreme_"$MODEL"_defconfig
 case $MODEL in
 x1slte)
-    KERNEL_DEFCONFIG=extreme_x1slte_defconfig
     BOARD=SRPSJ28B018KU
 ;;
 x1s)
-    KERNEL_DEFCONFIG=extreme_x1s_defconfig
     BOARD=SRPSI19A018KU
 ;;
 y2slte)
-    KERNEL_DEFCONFIG=extreme_y2slte_defconfig
     BOARD=SRPSJ28A018KU
 ;;
 y2s)
-    KERNEL_DEFCONFIG=extreme_y2s_defconfig
     BOARD=SRPSG12A018KU
 ;;
 z3s)
-    KERNEL_DEFCONFIG=extreme_z3s_defconfig
     BOARD=SRPSI19B018KU
 ;;
 c1slte)
-    KERNEL_DEFCONFIG=extreme_c1slte_defconfig
     BOARD=SRPTC30B009KU
 ;;
 c1s)
-    KERNEL_DEFCONFIG=extreme_c1s_defconfig
     BOARD=SRPTB27D009KU
 ;;
 c2slte)
-    KERNEL_DEFCONFIG=extreme_c2slte_defconfig
     BOARD=SRPTC30A009KU
 ;;
 c2s)
-    KERNEL_DEFCONFIG=extreme_c2s_defconfig
     BOARD=SRPTB27C009KU
 ;;
 r8s)
-    KERNEL_DEFCONFIG=extreme_r8s_defconfig
     BOARD=SRPTF26B014KU
 ;;
-twrp_s20)
-    KERNEL_DEFCONFIG=twrp_s20_defconfig
-    TWRP_CONFIG=twrp.config
-    KSU_OPTION=n
-;;
-twrp_n20)
-    KERNEL_DEFCONFIG=twrp_n20_defconfig
-    TWRP_CONFIG=twrp.config
-    KSU_OPTION=n
-;;
-twrp_s20fe)
-    KERNEL_DEFCONFIG=twrp_s20fe_defconfig
-    TWRP_CONFIG=twrp.config
-    KSU_OPTION=n
-;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp_s20, twrp_n20, twrp_s20fe"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s"
     exit
 esac
+
+if [[ "$RECOVERY_OPTION" == "y" ]]; then
+    RECOVERY=recovery.config
+    KSU_OPTION=n
+fi
 
 if [ -z $KSU_OPTION ]; then
     read -p "Include Kernel Su (N/y): " KSU_OPTION
 fi
 
-case $KSU_OPTION in
-y)
+if [[ "$KSU_OPTION" == "y" ]]; then
     KSU=ksu.config
-;;
-esac
+fi
 
 
 rm -rf arch/arm64/configs/temp_defconfig
@@ -197,12 +177,17 @@ if [ -z "$KSU" ]; then
 else
     echo "KSU: $KSU"
 fi
+if [ -z "$RECOVERY" ]; then
+    echo "Recovery: N"
+else
+    echo "Recovery: Y"
+fi
 
 echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $TWRP_CONFIG $KSU 2>&1"
+run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $RECOVERY $KSU 2>&1"
 
 echo "Building kernel..."
 echo "-----------------------------------------------"
@@ -240,8 +225,7 @@ echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
 run_command "./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung"
 
-if [[ $MODEL != twrp* ]];
-then
+if [ -z "$RECOVERY" ]; then
     # Build ramdisk
     echo "Building RAMDisk..."
     echo "-----------------------------------------------"
