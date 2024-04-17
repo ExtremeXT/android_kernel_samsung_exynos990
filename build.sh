@@ -1,5 +1,4 @@
 #!/bin/bash
-
 abort()
 {
     cd -
@@ -9,8 +8,18 @@ abort()
     exit -1
 }
 
-MODEL=$1
-KSU_OPTION=$2
+run_command() {
+
+    local command="$@"
+    if [[ "$DEBUG" == "y" ]]; then
+        $command 2>&1 || abort
+        echo "-----------------------------------------------"
+    else
+        $command > >(while IFS= read -r line; do printf '\r%*s\r%s' "$(tput cols)" '' "$line"; done) 2>&1 || abort
+        echo -ne "\r\033[K"
+    fi
+}
+
 CORES=`cat /proc/cpuinfo | grep -c processor`
 
 echo "Preparing the build environment..."
@@ -37,13 +46,9 @@ if [ ! -f "$CLANG_DIR/bin/clang-18" ]; then
     echo "-----------------------------------------------"
     echo "Cleaning up..."
     popd > /dev/null
-    echo "-----------------------------------------------"
 fi
 
-rm -rf arch/arm64/configs/temp_defconfig
-rm -rf build/out/$MODEL
-mkdir -p build/out/$MODEL/zip/files
-mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
+
 
 # Apply KSU patch for FBE support
 # Else it'll lose allowlist on reboot
@@ -61,84 +66,132 @@ READELF=$CLANG_DIR/bin/llvm-readelf \
 O=out
 "
 
+#Get flags if supplied
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --model|-m)
+            MODEL="$2"
+            shift 2
+            ;;
+        --ksu|-k)
+            KSU_OPTION="$2"
+            shift 2
+            ;;
+        --debug|-d)
+            DEBUG="$2"
+            shift 2
+            ;;
+        --recovery|-r)
+            RECOVERY_OPTION="$2"
+            shift 2
+            ;;
+        *)
+            cat << EOF
+Usage: $(basename "$0") [options]
+Options:
+    -m, --model [value]    Specify the model code of the phone
+    -k, --ksu [N/y]        Include Kernel Su
+    -r, --recovery [N/y]   Compile kernel for an android recovery
+    -d, --debug [N/y]      Display outputs on seperate lines
+EOF
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z $MODEL ]; then
+    cat << EOF
+Select a model:
+    x1s         x1slte
+    y2s         y2slte
+    c1s         c1slte
+    c2s         c2slte
+    z3s         r8s
+EOF
+    read -p "Enter your choice (c2s, c1s, c2slte): " MODEL
+fi
+
 # Define specific variables
+KERNEL_DEFCONFIG=extreme_"$MODEL"_defconfig
 case $MODEL in
 x1slte)
-    KERNEL_DEFCONFIG=extreme_x1slte_defconfig
     BOARD=SRPSJ28B018KU
 ;;
 x1s)
-    KERNEL_DEFCONFIG=extreme_x1s_defconfig
     BOARD=SRPSI19A018KU
 ;;
 y2slte)
-    KERNEL_DEFCONFIG=extreme_y2slte_defconfig
     BOARD=SRPSJ28A018KU
 ;;
 y2s)
-    KERNEL_DEFCONFIG=extreme_y2s_defconfig
     BOARD=SRPSG12A018KU
 ;;
 z3s)
-    KERNEL_DEFCONFIG=extreme_z3s_defconfig
     BOARD=SRPSI19B018KU
 ;;
 c1slte)
-    KERNEL_DEFCONFIG=extreme_c1slte_defconfig
     BOARD=SRPTC30B009KU
 ;;
 c1s)
-    KERNEL_DEFCONFIG=extreme_c1s_defconfig
     BOARD=SRPTB27D009KU
 ;;
 c2slte)
-    KERNEL_DEFCONFIG=extreme_c2slte_defconfig
     BOARD=SRPTC30A009KU
 ;;
 c2s)
-    KERNEL_DEFCONFIG=extreme_c2s_defconfig
     BOARD=SRPTB27C009KU
 ;;
 r8s)
-    KERNEL_DEFCONFIG=extreme_r8s_defconfig
     BOARD=SRPTF26B014KU
 ;;
-twrp_s20)
-    KERNEL_DEFCONFIG=twrp_s20_defconfig
-;;
-twrp_n20)
-    KERNEL_DEFCONFIG=twrp_n20_defconfig
-;;
-twrp_s20fe)
-    KERNEL_DEFCONFIG=twrp_s20fe_defconfig
-;;
 *)
-    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp_s20, twrp_n20, twrp_s20fe"
+    echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s"
     exit
 esac
 
-case $KSU_OPTION in
-y)
+if [[ "$RECOVERY_OPTION" == "y" ]]; then
+    RECOVERY=recovery.config
+    KSU_OPTION=n
+fi
+
+if [ -z $KSU_OPTION ]; then
+    read -p "Include Kernel Su (N/y): " KSU_OPTION
+fi
+
+if [[ "$KSU_OPTION" == "y" ]]; then
     KSU=ksu.config
-;;
-*)
-    KSU= 
-esac
+fi
+
+
+rm -rf arch/arm64/configs/temp_defconfig
+rm -rf build/out/$MODEL
+mkdir -p build/out/$MODEL/zip/files
+mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
+
 
 # Build kernel image
 echo "-----------------------------------------------"
 echo "Defconfig: "$KERNEL_DEFCONFIG""
-echo "KSU: "$KSU""
+if [ -z "$KSU" ]; then
+    echo "KSU: N"
+else
+    echo "KSU: $KSU"
+fi
+if [ -z "$RECOVERY" ]; then
+    echo "Recovery: N"
+else
+    echo "Recovery: Y"
+fi
+
 echo "-----------------------------------------------"
 echo "Building kernel using "$KERNEL_DEFCONFIG""
 echo "Generating configuration file..."
 echo "-----------------------------------------------"
-make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $KSU || abort
-echo "-----------------------------------------------"
+run_command "make ${MAKE_ARGS} -j$CORES $KERNEL_DEFCONFIG extreme.config $RECOVERY $KSU 2>&1"
+
 echo "Building kernel..."
 echo "-----------------------------------------------"
-make ${MAKE_ARGS} -j$CORES || abort
-echo "-----------------------------------------------"
+run_command "make ${MAKE_ARGS} -j$CORES"
 
 # Define constant variables
 DTB_PATH=build/out/$MODEL/dtb.img
@@ -165,34 +218,30 @@ cp out/arch/arm64/boot/Image build/out/$MODEL
 # Build dtb
 echo "Building common exynos9830 Device Tree Blob Image..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d out/arch/arm64/boot/dts/exynos || abort
-echo "-----------------------------------------------"
+run_command "./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/exynos9830.cfg -d out/arch/arm64/boot/dts/exynos"
 
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung || abort
-echo "-----------------------------------------------"
+run_command "./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung"
 
-if [[ $MODEL != twrp* ]];
-then
+if [ -z "$RECOVERY" ]; then
     # Build ramdisk
     echo "Building RAMDisk..."
     echo "-----------------------------------------------"
     pushd build/ramdisk > /dev/null
-    find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/$MODEL/ramdisk.cpio.gz || abort
+     find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | gzip > ../out/$MODEL/ramdisk.cpio.gz || abort
     popd > /dev/null
     echo "-----------------------------------------------"
 
     # Create boot image
     echo "Creating boot image..."
     echo "-----------------------------------------------"
-    ./toolchain/mkbootimg --base $BASE --board $BOARD --cmdline "$CMDLINE" --dtb $DTB_PATH \
+     ./toolchain/mkbootimg --base $BASE --board $BOARD --cmdline "$CMDLINE" --dtb $DTB_PATH \
     --dtb_offset $DTB_OFFSET --hashtype $HASHTYPE --header_version $HEADER_VERSION --kernel $KERNEL_PATH \
     --kernel_offset $KERNEL_OFFSET --os_patch_level $OS_PATCH_LEVEL --os_version $OS_VERSION --pagesize $PAGESIZE \
     --ramdisk $RAMDISK --ramdisk_offset $RAMDISK_OFFSET \
     --second_offset $SECOND_OFFSET --tags_offset $TAGS_OFFSET -o $OUTPUT_FILE || abort
-    echo "-----------------------------------------------"
 
     # Build zip
     echo "Building zip..."
@@ -212,10 +261,13 @@ then
     else
         NAME="$version"_"$MODEL"_UNOFFICIAL_"$DATE".zip
     fi
-    zip -r ../"$NAME" . || abort
+    if [[ "$DEBUG" == "y" ]]; then
+        zip -r ../"$NAME" .
+    else
+        zip -r -qq ../"$NAME" .
+    fi
     popd > /dev/null
-    echo "-----------------------------------------------"
 fi
 
 popd > /dev/null
-echo "Done!"
+echo "Done! Output Directory: build/out/$MODEL/"
