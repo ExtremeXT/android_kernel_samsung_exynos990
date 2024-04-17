@@ -153,13 +153,13 @@ r8s)
     BOARD=SRPTF26B014KU
 ;;
 twrp_s20)
-    KERNEL_DEFCONFIG=twrp_s20_defconfig
+    KERNEL_DEFCONFIG="twrp_s20_defconfig twrp.config"
 ;;
 twrp_n20)
-    KERNEL_DEFCONFIG=twrp_n20_defconfig
+    KERNEL_DEFCONFIG="twrp_n20_defconfig twrp.config"
 ;;
 twrp_s20fe)
-    KERNEL_DEFCONFIG=twrp_s20fe_defconfig
+    KERNEL_DEFCONFIG="twrp_s20fe_defconfig twrp.config"
 ;;
 *)
     echo "Unspecified device! Available models: x1slte, x1s, y2slte, y2s, z3s, c1slte, c1s, c2slte, c2s, r8s, twrp_s20, twrp_n20, twrp_s20fe"
