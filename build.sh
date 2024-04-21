@@ -89,6 +89,7 @@ LLVM=1 \
 LLVM_IAS=1 \
 ARCH=arm64 \
 CCACHE=$CCACHE \
+READELF=$CLANG_DIR/bin/llvm-readelf \
 O=out
 "
 
