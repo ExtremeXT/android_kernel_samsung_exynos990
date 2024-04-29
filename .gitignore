@@ -138,3 +138,7 @@ all.config
 
 # Clang toolchain
 /toolchain/neutron_18/
+
+# Auxiliary build files
+build/out/
+out/
