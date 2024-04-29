@@ -236,7 +236,7 @@ if [ -z "$RECOVERY" ]; then
     pushd build/out/$MODEL/zip > /dev/null
     DATE=`date +"%d-%m-%Y_%H-%M-%S"`
 
-    if [[ $KSU_OPTION -eq "y" ]]; then
+    if [[ "$KSU_OPTION" == "y" ]]; then
         NAME="$version"_"$MODEL"_UNOFFICIAL_KSU_"$DATE".zip
     else
         NAME="$version"_"$MODEL"_UNOFFICIAL_"$DATE".zip
