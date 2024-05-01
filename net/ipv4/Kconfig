@@ -470,7 +470,7 @@ config INET_DIAG_DESTROY
 
 config LARGE_TCP_INITIAL_BUFFER
 	bool "TCP: lock the initial window size to 64K"
-	default n
+	default y
 	---help---
 	  Lock the initial TCP window size to 64K.
 	  If unsure, say N.
