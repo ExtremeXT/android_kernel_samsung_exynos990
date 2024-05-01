@@ -6,18 +6,18 @@
 - OneUI 5.1 and OneUI 6.0 support
 - Supports all Exynos 990 devices
 - Compiled with Neutron Clang 18 + LLVM/LLVM_IAS and arhitecture optimization
-- Optional KernelSU (version 11682) with hiding mechanisms proted from GKI kernels
+- Optional KernelSU v0.9.3 (version 11804) support
 - Based on the latest Samsung source for Exynos 990
 - Fixed all compilation warnings and some Samsung bugs
 - Disabled Samsung's anti-rooting protection
-- Disabled most of Samsung's senseless logging and debugging
+- Partially disabled Samsung's excessive tracing
 - Enabled all TCP Scheduling Algorithms, CPU Governors and I/O Schedulers available in the source
 - SELinux Enforcing
 - Boeffla Wakelock Blocker support with a decent default list
 - Wireguard support
 - Charging Bypass support
 - LZ4 ZRAM compression by default
-- Backported the Timer Events Oriented (TEO) Governor from 5.x kernel
+- Backported the Timer Events Oriented (TEO) CPUIdle Governor from 5.x kernel
 - Backported VDSO(32) from upstream 4.19-stable kernel
 - Backported latest LZ4 1.9.4 module with ARM64v8 optimizations
 - Backported IncrementalFS (https://source.android.com/docs/core/architecture/kernel/incfs) from latest 4.19-stable (Requires ROM support)
@@ -61,17 +61,20 @@ G780F - S20 FE (4G) - r8s
 https://source.android.com/docs/setup/start/requirements
 
 * The `libarchive-tools` package is also necessary to patch the toolchain.
+* The `ccache` package is necessary if you wish to build with CCache (Quicker subsequest builds)
 
 2. Properly clone repository with submodules (KernelSU and toolchains)
 
 ```git clone --recurse-submodules https://github.com/ExtremeXT/android_kernel_samsung_exynos990.git```
 
-3. Build for your device, optionally with KSU
+3. Build for your device without CCache and with KSU
 
-```./build.sh x1slte y```
+```./build.sh -m x1slte -k y -c n```
 
 4. Fetch the flashable zip of the kernel that was just compiled
 
 ```build/out/[your_device]/ExtremeKernel...zip```
 
-# To be continued
+5. Flash it using a supported recovery like TWRP or PBRP (AOSP recovery does not work)
+
+6. Enjoy!
