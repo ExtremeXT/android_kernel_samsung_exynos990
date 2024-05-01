@@ -4,25 +4,25 @@
 # specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
 
 #<src>  <mnt_point>     <type>  <mnt_flags and options> <fs_mgr_flags>
-system	/system	erofs	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system	/system	ext4	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system	/system	f2fs	ro	wait,avb=vbmeta,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-product	/product	erofs	ro	wait,avb,logical,first_stage_mount
-product	/product	ext4	ro	wait,avb,logical,first_stage_mount
-product	/product	f2fs	ro	wait,avb,logical,first_stage_mount
-vendor	/vendor	erofs	ro	wait,avb,logical,first_stage_mount
-vendor	/vendor	ext4	ro	wait,avb,logical,first_stage_mount
-vendor	/vendor	f2fs	ro	wait,avb,logical,first_stage_mount
-odm	/odm	erofs	ro	wait,avb,logical,first_stage_mount
-odm	/odm	ext4	ro	wait,avb,logical,first_stage_mount
-odm	/odm	f2fs	ro	wait,avb,logical,first_stage_mount
+system	/system	erofs	ro	wait,logical,first_stage_mount
+system	/system	ext4	ro	wait,logical,first_stage_mount
+system	/system	f2fs	ro	wait,logical,first_stage_mount
+product	/product	erofs	ro	wait,logical,first_stage_mount
+product	/product	ext4	ro	wait,logical,first_stage_mount
+product	/product	f2fs	ro	wait,logical,first_stage_mount
+vendor	/vendor	erofs	ro	wait,logical,first_stage_mount
+vendor	/vendor	ext4	ro	wait,logical,first_stage_mount
+vendor	/vendor	f2fs	ro	wait,logical,first_stage_mount
+odm	/odm	erofs	ro	wait,logical,first_stage_mount
+odm	/odm	ext4	ro	wait,logical,first_stage_mount
+odm	/odm	f2fs	ro	wait,logical,first_stage_mount
 
-/dev/block/by-name/prism        /prism                  ext4    ro,barrier=1    nofail,avb,first_stage_mount
-/dev/block/by-name/optics       /optics                 ext4    ro,barrier=1    nofail,avb,first_stage_mount
+/dev/block/by-name/prism        /prism                  ext4    ro,barrier=1    nofail,first_stage_mount
+/dev/block/by-name/optics       /optics                 ext4    ro,barrier=1    nofail,first_stage_mount
 /dev/block/by-name/metadata	/metadata	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic,sync	wait,first_stage_mount,formattable,check
 
 /dev/block/by-name/cache	/cache	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check
-/dev/block/by-name/userdata	/data	f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,check,quota,reservedsize=128M,fileencryption=ice,checkpoint=fs,length=-20480
+/dev/block/by-name/userdata	/data	f2fs	noatime,nosuid,nodev,discard,usrquota,grpquota,fsync_mode=nobarrier,reserve_root=32768,resgid=5678	latemount,wait,check,quota,reservedsize=128M,checkpoint=fs,length=-20480
 /dev/block/by-name/efs	/mnt/vendor/efs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check
 /dev/block/by-name/cpefs	/mnt/vendor/cpefs	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,nofail
 /dev/block/by-name/misc	/misc	emmc	defaults	defaults,first_stage_mount
@@ -34,5 +34,5 @@ odm	/odm	f2fs	ro	wait,avb,logical,first_stage_mount
 /devices/platform/10e00000.usb*                auto    vfat    default    voldmanaged=usb:auto
 
 # Samsung ODE
-/dev/block/by-name/keydata	/keydata	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,fileencryption=ice,nofail
-/dev/block/by-name/keyrefuge	/keyrefuge	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,fileencryption=ice,nofail
+/dev/block/by-name/keydata	/keydata	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,nofail
+/dev/block/by-name/keyrefuge	/keyrefuge	ext4	noatime,nosuid,nodev,noauto_da_alloc,discard,journal_checksum,data=ordered,errors=panic	wait,check,nofail
