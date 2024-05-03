@@ -544,15 +544,17 @@ static int __init fscrypt_init(void)
 	res = sdp_crypto_init();
 	if (!fscrypt_sdp_init_sdp_info_cachep())
 		goto fail_free_info;
-#endif
+#endif /* CONFIG_FSCRYPT_SDP */
 	return 0;
 
-fail_free_info:
-	kmem_cache_destroy(fscrypt_info_cachep);
 fail_free_ctx:
 	kmem_cache_destroy(fscrypt_ctx_cachep);
 fail_free_queue:
 	destroy_workqueue(fscrypt_read_workqueue);
+#ifdef CONFIG_FSCRYPT_SDP
+fail_free_info:
+	kmem_cache_destroy(fscrypt_info_cachep);
+#endif /* CONFIG_FSCRYPT_SDP */
 fail:
 	return res;
 }
