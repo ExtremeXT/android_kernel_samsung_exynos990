@@ -549,7 +549,7 @@ static struct of_device_id rt8547_dt_ids[] = {
 
 static struct platform_driver rt8547_driver = {
 	.driver = {
-		.name = rt8547_NAME,
+		.name = "leds-rt8547",
 		.owner = THIS_MODULE,
 #ifdef CONFIG_OF
 		.of_match_table = rt8547_dt_ids,
@@ -560,19 +560,9 @@ static struct platform_driver rt8547_driver = {
 	.remove = rt8547_remove,
 };
 
-static int __init rt8547_init(void)
-{
-	return platform_driver_register(&rt8547_driver);
-}
-
-static void __exit rt8547_exit(void)
-{
-	platform_driver_unregister(&rt8547_driver);
-}
-
-module_init(rt8547_init);
-module_exit(rt8547_exit);
+module_platform_driver(rt8547_driver);
 
 MODULE_AUTHOR("younghoon joo <yhoon.joo@samsung.com.com>");
 MODULE_DESCRIPTION("RT8547 driver");
 MODULE_LICENSE("GPL");
+MODULE_ALIAS("platform:leds-rt8547");

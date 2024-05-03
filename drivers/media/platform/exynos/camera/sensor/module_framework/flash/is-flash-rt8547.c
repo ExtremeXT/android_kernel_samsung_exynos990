@@ -159,7 +159,7 @@ static const struct v4l2_subdev_ops subdev_ops = {
 	.core = &core_ops,
 };
 
-static int __init flash_rt8547_probe(struct device *dev, struct i2c_client *client)
+static int flash_rt8547_probe(struct device *dev, struct i2c_client *client)
 {
 	int ret = 0, i = 0;
 	struct is_core *core;
@@ -249,7 +249,7 @@ p_err:
 	return ret;
 }
 
-static int __init flash_rt8547_platform_probe(struct platform_device *pdev)
+static int flash_rt8547_platform_probe(struct platform_device *pdev)
 {
 	int ret = 0;
 	struct device *dev;
@@ -272,11 +272,9 @@ p_err:
 
 static int flash_rt8547_platform_remove(struct platform_device *pdev)
 {
-	int ret = 0;
-
 	info("%s\n", __func__);
 
-	return ret;
+	return 0;
 }
 
 static const struct of_device_id exynos_is_sensor_flash_rt8547_match[] = {

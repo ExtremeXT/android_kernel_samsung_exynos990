@@ -17,8 +17,6 @@
 #include <linux/fs.h>
 #include <linux/delay.h>
 
-#define rt8547_NAME "leds-rt8547"
-
 #define RT8547_FLASH_CURRENT(mA) (((mA)-100)/50)
 #define RT8547_MOVIE_CURRENT(mA) (((mA)-25)/25)
 #define RT8547_MOVIE_REG(val) (((val)*25)+25)
