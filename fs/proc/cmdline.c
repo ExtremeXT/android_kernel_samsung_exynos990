@@ -19,6 +19,7 @@ static int cmdline_proc_show(struct seq_file *m, void *v)
 	return 0;
 }
 
+#ifdef CONFIG_PROC_SPOOF_CMDLINE
 static int process_flag(int replace, const char *flag, const char *new_var)
 {
 	char *start_flag, *end_flag, *next_flag;
@@ -79,12 +80,14 @@ static int process_flag(int replace, const char *flag, const char *new_var)
 
 	return ret;
 }
+#endif
 
 static int __init proc_cmdline_init(void)
 {
 	memcpy(new_command_line, saved_command_line,
 		min((size_t)COMMAND_LINE_SIZE, strlen(saved_command_line)));
 
+#ifdef CONFIG_PROC_SPOOF_CMDLINE
 	/*
 	 * Remove various flags from command line seen by userspace in order to
 	 * pass SafetyNet CTS check.
@@ -92,6 +95,7 @@ static int __init proc_cmdline_init(void)
 	process_flag(FLAG_REPLACE, "androidboot.verifiedbootstate=", "green"); // Play Integrity API / SafetyNet
 	process_flag(FLAG_REPLACE, "androidboot.warranty_bit=", "0"); // Bootloader status and Knox
 	process_flag(FLAG_REPLACE, "androidboot.fmp_config=", "1"); // Samsung Knox FMP / FIPS
+#endif
 
 	proc_create_single("cmdline", 0, NULL, cmdline_proc_show);
 	return 0;
