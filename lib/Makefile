@@ -271,7 +271,6 @@ obj-$(CONFIG_UBSAN) += ubsan.o
 UBSAN_SANITIZE_ubsan.o := n
 
 obj-$(CONFIG_SBITMAP) += sbitmap.o
-obj-$(CONFIG_FFSI) += ffsi.o
 obj-$(CONFIG_PARMAN) += parman.o
 
 # GCC library routines
