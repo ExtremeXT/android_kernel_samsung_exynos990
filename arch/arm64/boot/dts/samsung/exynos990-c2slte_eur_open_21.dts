@@ -9,7 +9,7 @@
 	fragment@0 {
 		target = <0xffffffff>;
 
-		__overlay__ {i
+		__overlay__ {
 
 			m-pmic-irq {
 				samsung,pins = "gpa0-1";
