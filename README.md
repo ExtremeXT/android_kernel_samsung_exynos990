@@ -3,10 +3,10 @@
 ## Features
 
 - Linux 4.19.87
-- OneUI 5.1 and OneUI 6.0 support
+- OneUI 6.x support
 - Supports all Exynos 990 devices
 - Compiled with Neutron Clang 18 + LLVM/LLVM_IAS and arhitecture optimization
-- Optional KernelSU v0.9.3 (version 11804) support
+- KernelSU v0.9.5 (version 11872) support
 - Based on the latest Samsung source for Exynos 990
 - Fixed all compilation warnings and some Samsung bugs
 - Disabled Samsung's anti-rooting protection
