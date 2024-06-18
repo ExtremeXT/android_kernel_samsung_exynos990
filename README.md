@@ -1,4 +1,8 @@
-# ExtremeKernel for Exynos 990 devices
+# ExtremeKernel for Exynos 990 devices (EOL)
+
+## Notice
+
+At the time of writing, this project is not in active development.
 
 ## Features
 
