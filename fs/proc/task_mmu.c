@@ -497,6 +497,16 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 
 	start = vma->vm_start;
 	end = vma->vm_end;
+
+#ifdef CONFIG_KSU_SUSFS_SUS_MAPS
+	out_name = kmalloc(SUSFS_MAX_LEN_PATHNAME, GFP_KERNEL);
+	if (!out_name)
+		goto orig_flow;
+	ret = susfs_sus_maps(ino, end - start, &ino, &dev, &flags, &pgoff, vma, out_name);
+
+orig_flow:
+#endif
+
 	if (show_vma_header_prefix(m, start, end, flags, pgoff, dev, ino))
 		return;
 
