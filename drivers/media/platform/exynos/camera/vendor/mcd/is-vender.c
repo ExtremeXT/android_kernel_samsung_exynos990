@@ -2659,7 +2659,8 @@ bool is_vender_wdr_mode_on(void *cis_data)
 
 bool is_vender_aeb_mode_on(void *cis_data)
 {
-	return (((cis_shared_data *)cis_data)->is_data.sensor_hdr_mode == SENSOR_HDR_MODE_2AEB ? true : false);
+	//return (((cis_shared_data *)cis_data)->is_data.sensor_hdr_mode == SENSOR_HDR_MODE_2AEB ? true : false);
+	return ((enum is_sensor_hdr_mode)((cis_shared_data *)cis_data)->is_data.sensor_hdr_mode == SENSOR_HDR_MODE_2AEB ? true : false);
 }
 
 bool is_vender_enable_wdr(void *cis_data)
