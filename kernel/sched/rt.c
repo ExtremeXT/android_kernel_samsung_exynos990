@@ -2578,6 +2578,7 @@ const struct sched_class rt_sched_class = {
 #endif
 #ifdef CONFIG_RT_GROUP_SCHED
 	.task_change_group	= frt_task_change_group_rt,
+#endif
 };
 
 #ifdef CONFIG_RT_GROUP_SCHED
