@@ -721,60 +721,19 @@ KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
                  $(call cc-option,-fno-partial-inlining)
 endif
 
-KBUILD_CFLAGS	+= -mllvm -aggressive-ext-opt \
-           -mllvm -enable-cond-stores-vec \
-           -mllvm -slp-vectorize-hor-store \
-           -mllvm -adce-remove-loops \
-           -mllvm -enable-cse-in-irtranslator \
-           -mllvm -enable-cse-in-legalizer \
-           -mllvm -scalar-evolution-use-expensive-range-sharpening \
-           -mllvm -loop-rotate-multi \
-           -mllvm -enable-interleaved-mem-accesses \
-           -mllvm -enable-masked-interleaved-mem-accesses \
-           -mllvm -enable-gvn-hoist \
-           -mllvm -allow-unroll-and-jam \
-           -mllvm -enable-loop-distribute \
-           -mllvm -enable-loop-flatten \
-           -mllvm -enable-loopinterchange \
-           -mllvm -enable-unroll-and-jam \
-           -mllvm -extra-vectorizer-passes \
-           -mllvm -unroll-runtime-multi-exit \
-           -mllvm -hot-cold-split=true
-
 ifdef CONFIG_LLVM_POLLY
 KBUILD_CFLAGS	+= -mllvm -polly \
-		   -mllvm -polly-run-dce \
-		   -mllvm -polly-run-inliner \
 		   -mllvm -polly-ast-use-context \
-		   -mllvm -polly-detect-keep-going \
-		   -mllvm -polly-vectorizer=stripmine \
 		   -mllvm -polly-invariant-load-hoisting \
-		   -mllvm -polly-optimizer=isl \
-		   -mllvm -polly-isl-arg=--no-schedule-serialize-sccs \
-           -mllvm -polly-dependences-analysis-type=value-based \
-           -mllvm -polly-dependences-computeout=0 \
-           -mllvm -polly-enable-delicm \
-           -mllvm -polly-loopfusion-greedy \
-           -mllvm -polly-num-threads=0 \
-           -mllvm -polly-omp-backend=LLVM \
-           -mllvm -polly-parallel \
-           -mllvm -polly-postopts \
-           -mllvm -polly-reschedule \
-           -mllvm -polly-scheduling-chunksize=1 \
-           -mllvm -polly-scheduling=dynamic \
-           -mllvm -polly-tiling
+		   -mllvm -polly-run-inliner \
+		   -mllvm -polly-vectorizer=stripmine
+# Polly may optimise loops with dead paths beyound what the linker
+# # can understand. This may negate the effect of the linker's DCE
+# # so we tell Polly to perfom proven DCE on the loops it optimises
+# # in order to preserve the overall effect of the linker's DCE.
+ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+KBUILD_CFLAGS	+= -mllvm -polly-run-dce
 endif
-
-ifdef CONFIG_LLVM_DFA_JUMP_THREAD
-KBUILD_CFLAGS	+= -mllvm -enable-dfa-jump-thread
-endif
-
-ifdef CONFIG_LLVM_MLGO_REGISTER
-# Enable MLGO for register allocation. default, release, development
-KBUILD_CFLAGS	+= -mllvm -regalloc-enable-advisor=release \
-		   -mllvm -enable-local-reassign
-KBUILD_LDFLAGS	+= -mllvm -regalloc-enable-advisor=release \
-		   -mllvm -enable-local-reassign
 endif
 
 ifneq ($(CONFIG_FRAME_WARN),0)
