@@ -1,0 +1,82 @@
+name: Build Artisan Kernel for Exynos 990 Devices
+
+on:
+  push:
+    branches:
+      - main  # Trigger the action on pushing to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger the action on pull requests to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch the full history for submodules
+    
+    - name: Set up Java Development Kit (JDK) 11
+      run: sudo apt-get install openjdk-11-jdk -y
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          ccache \
+          libarchive-tools \
+          curl \
+          git \
+          build-essential \
+          bison \
+          flex \
+          gcc \
+          g++ \
+          make \
+          bc \
+          libncurses5-dev \
+          libncurses6-dev \
+          zlib1g-dev \
+          libssl-dev \
+          libelf-dev \
+          liblz4-tool \
+          gcc-8 \
+          clang \
+          llvm
+
+    - name: Set up toolchain (Neutron Clang 18)
+      run: |
+        git clone https://github.com/NeutronClang/clang.git /clang
+        export PATH=$PWD/clang/bin:$PATH
+
+    - name: Clone the repository with submodules
+      run: git clone --recurse-submodules https://github.com/Android-Artisan/android_kernel_samsung_exynos990.git
+
+    - name: Build Kernel for all devices
+      run: |
+        cd android_kernel_samsung_exynos990
+        devices=(
+          "x1slte"  # G980F - S20 4G
+          "x1s"     # G981B - S20 5G
+          "y2slte"  # G985F - S20+ 4G
+          "y2s"     # G986B - S20+ 5G
+          "z3s"     # G988B - S20 Ultra (5G)
+          "c1slte"  # N980F - Note 20 4G
+          "c1s"     # N981B - Note 20 5G
+          "c2slte"  # N985F - Note 20 Ultra 4G
+          "c2s"     # N986B - Note 20 Ultra 5G
+          "r8s"     # G780F - S20 FE (4G)
+        )
+        
+        for device in "${devices[@]}"; do
+          echo "Building for device: $device"
+          ./build.sh -m $device -k y -c n
+        done
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ArtisanKernel
+        path: build/out/*/*.zip  # This will upload all build artifacts from all devices
