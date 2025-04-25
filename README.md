@@ -1,4 +1,5 @@
 # ArtisanKernel for Exynos 990 devices
+### Based On ExtremeKernel
 
 ## Features
 
