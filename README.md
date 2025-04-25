@@ -78,4 +78,4 @@ https://source.android.com/docs/setup/start/requirements
 
 5. Flash it using a supported recovery like TWRP or PBRP (AOSP recovery does not work)
 
-6. Enjoy!
+6. Enjoy your ArtisanKRNL Build!
